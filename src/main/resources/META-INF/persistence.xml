@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+                                  http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+             version="2.2">
+
+    <persistence-unit name="kimwanyiSaccoPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- Entity classes are registered explicitly in Section 4, one <class>
+             per entity — avoids relying on classpath scanning across the WAR,
+             which is slower to start and less predictable in a plain
+             servlet-container deployment (no full Java EE scanning support). -->
+
+        <!-- ==================== Connection via JNDI (Tomcat-managed) ====================
+             The DataSource — and its credentials — are configured once in
+             Tomcat's own context.xml (outside the WAR, never committed to
+             source control) and looked up by name here. Deploying a new
+             WAR never touches, exposes, or overwrites the DB password
+             (OWASP A05: Security Misconfiguration). The pool itself is
+             HikariCP, wired via HikariJNDIFactory in context.xml. -->
+        <non-jta-data-source>java:comp/env/jdbc/kimwanyiSaccoDS</non-jta-data-source>
+
+        <properties>
+            <!-- ==================== Hibernate behaviour ==================== -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+            <!-- validate, not update/create: schema.sql (Section 2) is the
+                 single source of truth for the schema. Hibernate is never
+                 allowed to silently alter production tables — it only
+                 verifies entity mappings match what's already there. -->
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.jdbc.batch_size" value="20"/>
+            <property name="hibernate.order_inserts" value="true"/>
+            <property name="hibernate.order_updates" value="true"/>
+
+            <!-- Second-level cache disabled deliberately: for a ledger-style
+                 schema where balance correctness under concurrency is the
+                 top priority, a stale cached read is a bigger risk than the
+                 performance this SACCO's data volume actually needs. -->
+            <property name="hibernate.cache.use_second_level_cache" value="false"/>
+        </properties>
+    </persistence-unit>
+
+</persistence>

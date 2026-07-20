@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                                   http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_3.xsd"
+              version="2.3">
+
+    <application>
+        <resource-bundle>
+            <base-name>messages</base-name>
+            <var>msg</var>
+        </resource-bundle>
+        <!-- Centralised message bundle: validation and business-rule error
+             text (e.g. "insufficient balance", "maximum loan exceeded")
+             lives in one place, not scattered as string literals across
+             managed beans (Section 9). -->
+        <locale-config>
+            <default-locale>en</default-locale>
+        </locale-config>
+    </application>
+
+    <!-- Beans are declared with @Named/@SessionScoped etc. via CDI (Weld),
+         not here — this file stays lean and holds only app-wide config,
+         matching modern JSF 2.3 practice rather than JSF 1.x style. -->
+
+</faces-config>
