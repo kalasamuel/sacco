@@ -1,15 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-    NOT packaged inside the WAR. Copy this file to:
-        $CATALINA_BASE/conf/Catalina/localhost/kimwanyi-sacco.xml
-    (or edit $CATALINA_BASE/conf/context.xml for a global default).
-
-    Keeping this outside the deployable artifact means the database
-    password never travels with the WAR file, is never committed to
-    version control, and can be rotated on the server without a
-    redeploy — a direct fix for "if the manager's laptop is lost we
-    lose everything": the app server, not a laptop, now owns this.
--->
 <Context>
 
     <Resource name="jdbc/kimwanyiSaccoDS"
@@ -18,8 +7,8 @@
               factory="com.zaxxer.hikari.HikariJNDIFactory"
               driverClassName="com.mysql.cj.jdbc.Driver"
               jdbcUrl="jdbc:mysql://localhost:3306/kimwanyi_sacco?useSSL=false&amp;serverTimezone=Africa/Kampala&amp;characterEncoding=UTF-8"
-              username="CHANGE_ME_DB_USER"
-              password="CHANGE_ME_DB_PASSWORD"
+              username="root"
+              password="KmaciS_394846"
               maximumPoolSize="10"
               minimumIdle="2"
               connectionTimeout="30000"

@@ -15,96 +15,105 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <jsf.version>2.3.9</jsf.version>
-        <primefaces.version>12.0.0</primefaces.version>
-        <hibernate.version>5.6.15.Final</hibernate.version>
-        <weld.version>3.1.9.Final</weld.version>
+        <jsf.version>4.0.7</jsf.version>
+        <primefaces.version>14.0.0</primefaces.version>
+        <hibernate.version>6.4.10.Final</hibernate.version>
+        <weld.version>5.1.5.Final</weld.version>
         <mysql.version>8.0.33</mysql.version>
     </properties>
 
     <dependencies>
 
-        <!-- ==================== Servlet API (provided by Tomcat) ==================== -->
+        <!-- Jakarta Servlet API -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- ==================== JSF (Mojarra) — Tomcat has no JSF impl built in ==================== -->
+        <!-- JSF (Mojarra)-->
         <dependency>
             <groupId>org.glassfish</groupId>
-            <artifactId>javax.faces</artifactId>
+            <artifactId>jakarta.faces</artifactId>
             <version>${jsf.version}</version>
         </dependency>
 
-        <!-- ==================== PrimeFaces UI component suite ==================== -->
+        <!-- PrimeFaces UI component suite -->
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
             <version>${primefaces.version}</version>
+            <classifier>jakarta</classifier>
         </dependency>
 
-        <!-- ==================== CDI (Weld) — Tomcat has no CDI container built in ====================
-             Enables @Named / @SessionScoped / @Inject managed beans (Section 9) instead of the
-             deprecated javax.faces.bean.* annotations. -->
+        <!-- Jakarta Common Annotations -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
+        <!-- CDI (Weld) -->
         <dependency>
             <groupId>org.jboss.weld.servlet</groupId>
             <artifactId>weld-servlet-shaded</artifactId>
             <version>${weld.version}</version>
         </dependency>
 
-        <!-- ==================== Bean Validation (server-side field validation) ==================== -->
+        <!-- Bean Validation (server-side field validation) -->
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.2.5.Final</version>
+            <version>8.0.2.Final</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
-            <version>3.0.1-b12</version>
+            <artifactId>jakarta.el</artifactId>
+            <version>4.0.2</version>
         </dependency>
 
-        <!-- ==================== Hibernate ORM / JPA ==================== -->
+        <!-- Hibernate ORM / JPA -->
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${hibernate.version}</version>
         </dependency>
 
-        <!-- ==================== MySQL JDBC Driver ==================== -->
+        <!-- MySQL JDBC Driver -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>${mysql.version}</version>
         </dependency>
 
-        <!-- ==================== Connection Pooling ====================
-             HikariCP — chosen over the default Hibernate connection provider
-             for its low overhead and safer defaults under concurrent load,
-             which matters directly for the withdraw/deposit race-condition
-             handling decided in Section 1. -->
+        <!-- Connection Pooling HikariCP -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>4.0.3</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-hikaricp</artifactId>
             <version>${hibernate.version}</version>
         </dependency>
 
-        <!-- ==================== Password Hashing (BCrypt) ==================== -->
+        <!-- PDF generation (account statements) -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.32</version>
+        </dependency>
+
+        <!-- Password Hashing (BCrypt) -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
 
-        <!-- ==================== Logging ==================== -->
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -116,7 +125,7 @@
             <version>1.2.12</version>
         </dependency>
 
-        <!-- ==================== Testing ==================== -->
+        <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
