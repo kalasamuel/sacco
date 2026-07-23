@@ -6,7 +6,7 @@
               type="javax.sql.DataSource"
               factory="com.zaxxer.hikari.HikariJNDIFactory"
               driverClassName="com.mysql.cj.jdbc.Driver"
-              jdbcUrl="jdbc:mysql://localhost:3306/kimwanyi_sacco?useSSL=false&amp;serverTimezone=Africa/Kampala&amp;characterEncoding=UTF-8"
+              jdbcUrl="jdbc:mysql://localhost:3306/kimwanyi_sacco?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=Africa/Kampala&amp;characterEncoding=UTF-8"
               username="root"
               password="KmaciS_394846"
               maximumPoolSize="10"
