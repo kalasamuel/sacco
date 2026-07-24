@@ -32,6 +32,11 @@ public class CurrentUserBean implements Serializable {
         return user != null ? user.getRole() : null;
     }
 
+    public Long getMemberId() {
+        User user = getUser();
+        return user != null && user.getMemberProfile() != null ? user.getMemberProfile().getId() : null;
+    }
+
     public boolean isAdmin() { return getRole() == Role.ADMIN; }
     public boolean isLoanOfficer() { return getRole() == Role.LOAN_OFFICER; }
     public boolean isCashier() { return getRole() == Role.CASHIER; }

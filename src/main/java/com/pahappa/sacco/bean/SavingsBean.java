@@ -45,16 +45,36 @@ public class SavingsBean implements Serializable {
     private Transaction receiptTransaction;
 
     public void loadMember(Long memberId) {
-        this.selectedMemberId = memberId;
-        this.selectedMember = memberService.findById(memberId);
-        refresh();
-        resolveActiveLoanStatus();
+        try {
+            this.selectedMemberId = memberId;
+            this.selectedMember = memberService.findById(memberId);
+            refresh();
+            resolveActiveLoanStatus();
+        } catch (BusinessRuleViolationException | UnauthorizedException e) {
+            FacesMessageUtil.addError(e.getMessage());
+            clearSelection();
+        } catch (Exception e) {
+            FacesMessageUtil.addError("Unable to load member account. Please try again.");
+            clearSelection();
+        }
     }
 
     public void loadIfPresent() {
         if (selectedMemberId != null) {
             loadMember(selectedMemberId);
+        } else {
+            clearSelection();
         }
+    }
+
+    private void clearSelection() {
+        this.selectedMember = null;
+        this.currentBalance = BigDecimal.ZERO;
+        this.statement = null;
+        this.activeLoanStatusLabel = null;
+        this.amount = null;
+        this.receiptPreviousBalance = null;
+        this.receiptTransaction = null;
     }
 
     public void deposit() {

@@ -45,6 +45,30 @@
 
                 <p:commandButton value="Save Changes" action="#{profileBean.save}" update="@form" styleClass="ui-button-primary button-primary"/>
             </h:form>
+
+            <h:form prependId="false" styleClass="form-card mt-18">
+                <div class="section-header"><h3>Change Login Credentials</h3></div>
+
+                <div class="input-group">
+                    <label for="requestedUsername">Username</label>
+                    <p:inputText id="requestedUsername" value="#{profileBean.requestedUsername}" styleClass="ui-inputtext">
+                        <p:ajax event="blur" listener="#{profileBean.checkUsernameAvailability}"
+                                update="usernameAvailabilityMessage" process="@this"/>
+                    </p:inputText>
+                    <p:message id="requestedUsernameMsg" for="requestedUsername"/>
+                    <p:outputLabel id="usernameAvailabilityMessage" value="#{profileBean.usernameAvailabilityMessage}" styleClass="text-caption"/>
+                </div>
+                <div class="input-group">
+                    <label for="newPassword">New Password</label>
+                    <p:password id="newPassword" value="#{profileBean.newPassword}" feedback="false" styleClass="ui-inputtext"/>
+                </div>
+                <div class="input-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <p:password id="confirmPassword" value="#{profileBean.confirmPassword}" feedback="false" styleClass="ui-inputtext"/>
+                </div>
+
+                <p:commandButton value="Update Login" action="#{profileBean.saveCredentials}" update="@form" styleClass="ui-button-secondary button-secondary"/>
+            </h:form>
         </div>
     </div>
 

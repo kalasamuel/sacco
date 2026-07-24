@@ -112,7 +112,7 @@ public class SavingsService {
     public BigDecimal getBalance(Long memberId) {
         return accountDao.findByMemberId(memberId)
                 .map(Account::getBalance)
-                .orElseThrow(() -> new BusinessRuleViolationException("No savings account found for this member."));
+                .orElse(BigDecimal.ZERO);
     }
 
     //Informational-only maximum loan eligibility (3x savings balance),
@@ -124,9 +124,9 @@ public class SavingsService {
     }
 
     public List<Transaction> getStatement(Long memberId) {
-        Account account = accountDao.findByMemberId(memberId)
-                .orElseThrow(() -> new BusinessRuleViolationException("No savings account found for this member."));
-        return transactionDao.findByAccountOrderedDesc(account.getId());
+        return accountDao.findByMemberId(memberId)
+                .map(account -> transactionDao.findByAccountOrderedDesc(account.getId()))
+                .orElseGet(java.util.Collections::emptyList);
     }
 
     //Total savings held across every account, right now — the direct

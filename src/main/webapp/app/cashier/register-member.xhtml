@@ -17,11 +17,9 @@
         <div class="form-grid">
             <div class="input-group">
                 <label for="membershipNumber">Membership Number</label>
-                <p:inputText id="membershipNumber" value="#{memberRegistrationBean.membershipNumber}" required="true" styleClass="ui-inputtext">
-                    <p:ajax event="blur" listener="#{memberRegistrationBean.checkMembershipNumberDuplicate}"
-                            update="membershipNumberMsg" process="@this"/>
-                </p:inputText>
+                <p:inputText id="membershipNumber" value="#{memberRegistrationBean.membershipNumber}" readonly="true" styleClass="ui-inputtext"/>
                 <p:message id="membershipNumberMsg" for="membershipNumber"/>
+                <p class="text-caption mt-2">Automatically generated from the member's name. You can manually refresh the value by editing the first and last name fields.</p>
             </div>
 
             <div class="input-group">
@@ -35,12 +33,18 @@
 
             <div class="input-group">
                 <label for="firstName">First Name</label>
-                <p:inputText id="firstName" value="#{memberRegistrationBean.firstName}" required="true" styleClass="ui-inputtext"/>
+                <p:inputText id="firstName" value="#{memberRegistrationBean.firstName}" required="true" styleClass="ui-inputtext">
+                    <p:ajax event="blur" listener="#{memberRegistrationBean.generateMembershipNumberIfBlank}"
+                            update="membershipNumber" process="@this"/>
+                </p:inputText>
             </div>
 
             <div class="input-group">
                 <label for="lastName">Last Name</label>
-                <p:inputText id="lastName" value="#{memberRegistrationBean.lastName}" required="true" styleClass="ui-inputtext"/>
+                <p:inputText id="lastName" value="#{memberRegistrationBean.lastName}" required="true" styleClass="ui-inputtext">
+                    <p:ajax event="blur" listener="#{memberRegistrationBean.generateMembershipNumberIfBlank}"
+                            update="membershipNumber" process="@this"/>
+                </p:inputText>
             </div>
 
             <div class="input-group">
@@ -51,6 +55,15 @@
             <div class="input-group">
                 <label for="email">Email</label>
                 <p:inputText id="email" value="#{memberRegistrationBean.email}" styleClass="ui-inputtext"/>
+            </div>
+
+            <div class="input-group">
+                <label for="role">Role</label>
+                <p:selectOneMenu id="role" value="#{memberRegistrationBean.selectedRole}" required="true" styleClass="ui-inputtext">
+                    <f:selectItems value="#{memberRegistrationBean.availableRoles}" var="role"
+                                   itemValue="#{role}" itemLabel="#{memberRegistrationBean.roleLabel(role)}"/>
+                </p:selectOneMenu>
+                <p:message id="roleMsg" for="role"/>
             </div>
 
             <div class="input-group">

@@ -9,8 +9,8 @@
 <ui:define name="content">
 
     <f:metadata>
-        <f:viewAction action="#{savingsBean.loadMember(currentUser.user.memberProfile.id)}"/>
-        <f:viewAction action="#{loanApplicationBean.loadHistory(currentUser.user.memberProfile.id)}"/>
+        <f:viewAction action="#{savingsBean.loadMember(currentUser.memberId)}"/>
+        <f:viewAction action="#{loanApplicationBean.loadHistory(currentUser.memberId)}"/>
     </f:metadata>
 
     <h1 class="page-title">Welcome, #{currentUser.fullName}</h1>
@@ -19,7 +19,7 @@
         <h3 class="section-title">Savings Balance</h3>
         <div class="balance-figure"><h:outputText value="#{savingsBean.currentBalance}"><f:converter converterId="moneyConverter"/></h:outputText></div>
         <p>
-            <a href="../common/statement?memberId=#{currentUser.user.memberProfile.id}"
+            <a href="../common/statement?memberId=#{currentUser.memberId}"
                target="_blank">Download Account Statement (PDF)</a>
         </p>
     </div>

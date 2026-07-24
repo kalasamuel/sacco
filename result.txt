@@ -1,3 +1,30 @@
+the system should be able to generate the membership id and fill in the "Membership Number" field on the http://localhost:8080/kimwanyi-sacco/app/cashier/register-member.xhtml page automatically when registering a user. Then the first time password and username (from the combination of the first and last name and the member number) are sent to the new member's email for the registered member to log in into the system and then be able to change their password to their own custom password and username into their custom username but must never resemble an existing username(this must lively show the user if the username exists already).
+
+
+
+Username: member001
+
+Password: P@ssw0rd123
+
+Role: MEMBER
+
+Username: cashier001
+
+Password: P@ssw0rd123
+
+Role: CASHIER
+
+Username: officer001
+
+Password: P@ssw0rd123
+
+Role: LOAN_OFFICER
+
+
+
+
+
+
 Will list project files under webapp and Java packages to find existing JSF pages and backing beans so I can identify missing pieces before making changes. Running file searches (glob/grep).
 
 Searched for files matching `src/main/webapp/**`, 25 results

@@ -114,6 +114,13 @@
             <version>0.4</version>
         </dependency>
 
+        <!--JavaMail for emails-->        
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
         <!--Logging-->
         <dependency>
             <groupId>org.slf4j</groupId>

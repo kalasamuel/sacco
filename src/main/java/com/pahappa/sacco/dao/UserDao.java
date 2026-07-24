@@ -17,7 +17,7 @@ public class UserDao extends GenericDao<User, Long> {
     public Optional<User> findByUsername(String username) {
         try {
             TypedQuery<User> query = em().createQuery(
-                    "SELECT u FROM User u WHERE u.username = :username", User.class);
+                    "SELECT u FROM User u LEFT JOIN FETCH u.memberProfile WHERE u.username = :username", User.class);
             query.setParameter("username", username == null ? "" : username.trim());
             return Optional.of(query.getSingleResult());
         } catch (NoResultException e) {
