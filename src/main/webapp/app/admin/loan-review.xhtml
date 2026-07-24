@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 template="/WEB-INF/templates/layout.xhtml">
+<ui:define name="title">Loan Desk</ui:define>
+<ui:define name="content">
+
+    <f:metadata>
+        <f:viewAction action="#{loanReviewBean.loadPending}"/>
+        <f:viewAction action="#{loanReviewBean.loadOverdue}"/>
+    </f:metadata>
+
+    <h1 class="page-title">Loan Desk</h1>
+    <p class="section-intro">Review pending applications and overdue loans in a single desk interface. Approvals depend on entitlement rules and repayment status.</p>
+
+    <h:form prependId="false" id="pendingForm">
+        <input id="csrfTokenLoanPendingRoot" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+
+        <ui:repeat value="#{loanReviewBean.pendingLoans}" var="loan">
+            <div class="panel-card mb-14">
+                <div class="card-row card-row--space-between">
+                    <div>
+                        <strong>#{loan.member.fullName}</strong> (#{loan.member.membershipNumber})<br/>
+                        Current Savings:
+                        <h:outputText value="#{loanReviewBean.eligibilityOf(loan).currentSavings}" class="money"><f:converter converterId="moneyConverter"/></h:outputText>
+                        &#160;|&#160; Max Entitlement (3x):
+                        <h:outputText value="#{loanReviewBean.eligibilityOf(loan).maxEntitlement}" class="money"><f:converter converterId="moneyConverter"/></h:outputText>
+                    </div>
+                    <div class="text-right min-width-200">
+                        Requested Principal: <strong><h:outputText value="#{loan.principal}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></strong><br/>
+                        Flat Interest (10%):
+                        <h:outputText value="#{loan.totalDue - loan.principal}" class="money"><f:converter converterId="moneyConverter"/></h:outputText>
+                        &#160;|&#160; Total Payable:
+                        <strong><h:outputText value="#{loan.totalDue}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></strong>
+                    </div>
+                </div>
+
+                <div class="divider-top">
+                    <span class="badge #{loanReviewBean.eligibilityOf(loan).withinEntitlement ? 'badge--pass' : 'badge--fail'}">
+                        #{loanReviewBean.eligibilityOf(loan).withinEntitlement ? 'PASS' : 'FAIL'} — 3x entitlement rule
+                    </span>
+                    &#160;
+                    <span class="badge #{loanReviewBean.eligibilityOf(loan).noOtherActiveLoan ? 'badge--pass' : 'badge--fail'}">
+                        #{loanReviewBean.eligibilityOf(loan).noOtherActiveLoan ? 'PASS' : 'FAIL'} — no other active loan
+                    </span>
+                </div>
+
+                <div class="card-row mt-16">
+                    <p:commandButton value="Approve &amp; Activate" action="#{loanReviewBean.approve(loan.id)}"
+                                      update=":pendingForm" styleClass="ui-button-success button-success"
+                                      disabled="#{!loanReviewBean.eligibilityOf(loan).allPass}"/>
+                    <p:commandButton value="Reject" action="#{loanReviewBean.prepareReject(loan.id)}"
+                                      update=":rejectDialog" oncomplete="PF('rejectDialog').show()"
+                                      styleClass="ui-button-danger button-danger"/>
+                </div>
+            </div>
+        </ui:repeat>
+
+        <h:outputText value="No pending applications." rendered="#{empty loanReviewBean.pendingLoans}" styleClass="text-muted-small"/>
+    </h:form>
+
+    <p:dialog widgetVar="rejectDialog" header="Reject Loan Application" modal="true" width="400" id="rejectDialog">
+        <h:form prependId="false">
+            <input id="csrfTokenLoanRejectDialog" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+            <p>Please provide a reason for rejecting this application. This is recorded on the loan record.</p>
+            <p:inputTextarea value="#{loanReviewBean.rejectionReason}" rows="4" styleClass="full-width" required="true"/>
+            <p:commandButton value="Confirm Rejection" action="#{loanReviewBean.confirmReject}"
+                              update=":pendingForm :rejectDialog" oncomplete="PF('rejectDialog').hide()"
+                              styleClass="ui-button-danger button-danger mt-12"/>
+        </h:form>
+    </p:dialog>
+
+    <section class="panel-card mt-28">
+        <h2 class="mt-0">Overdue Loans</h2>
+        <p class="section-intro">Overdue status is not automatic — run the sweep below to mark ACTIVE loans past due as OVERDUE.</p>
+        <h:form prependId="false" id="overdueForm">
+            <input id="csrfTokenLoanOverdueForm" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+            <p:commandButton value="Run Overdue Sweep" action="#{loanReviewBean.runOverdueSweep}"
+                              update=":overdueForm :overdueTable" styleClass="ui-button-primary button-primary"/>
+        </h:form>
+
+        <div id="overdueTable" class="table-card mt-18">
+            <p:dataTable id="overdueTable" value="#{loanReviewBean.overdueLoans}" var="loan" emptyMessage="No overdue loans.">
+                <p:column headerText="Member"><h:outputText value="#{loan.member.fullName}"/></p:column>
+                <p:column headerText="Membership #"><h:outputText value="#{loan.member.membershipNumber}"/></p:column>
+                <p:column headerText="Remaining Balance"><h:outputText value="#{loan.remainingBalance}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></p:column>
+                <p:column headerText="Due Date"><h:outputText value="#{loan.dueDate}"/></p:column>
+                <p:column headerText="">
+                    <h:form prependId="false">
+                        <input id="csrfTokenLoanViewLedger#{loan.id}" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+                        <p:commandButton value="View Repayment Ledger" action="#{loanReviewBean.viewRepaymentLedger(loan)}"
+                                          update=":ledgerDialog" oncomplete="PF('ledgerDialog').show()" styleClass="ui-button-secondary button-secondary"/>
+                    </h:form>
+                </p:column>
+            </p:dataTable>
+        </div>
+    </section>
+
+    <p:dialog widgetVar="ledgerDialog" header="Repayment Ledger" modal="true" width="480" id="ledgerDialog">
+        <h:panelGroup rendered="#{not empty loanReviewBean.loanBeingViewed}">
+            <p>
+                <strong>#{loanReviewBean.loanBeingViewed.member.fullName}</strong> —
+                Remaining: <h:outputText value="#{loanReviewBean.loanBeingViewed.remainingBalance}" class="money"><f:converter converterId="moneyConverter"/></h:outputText>
+                (Due: <h:outputText value="#{loanReviewBean.loanBeingViewed.dueDate}"/>)
+            </p>
+            <p:dataTable value="#{loanReviewBean.repaymentLedger}" var="r" emptyMessage="No repayments recorded yet — schedule compliance: none made.">
+                <p:column headerText="Date"><h:outputText value="#{r.createdAt}"/></p:column>
+                <p:column headerText="Amount"><h:outputText value="#{r.amount}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></p:column>
+                <p:column headerText="Remaining After"><h:outputText value="#{r.balanceAfter}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></p:column>
+                <p:column headerText="Reference"><h:outputText value="#{r.reference}"/></p:column>
+            </p:dataTable>
+        </h:panelGroup>
+    </p:dialog>
+
+</ui:define>
+</ui:composition>

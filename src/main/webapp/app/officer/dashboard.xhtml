@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 template="/WEB-INF/templates/layout.xhtml">
+<ui:define name="title">Loan Officer Dashboard</ui:define>
+<ui:define name="content">
+    <h1 class="page-title">Loan Officer Dashboard</h1>
+    <div class="section-intro">Welcome back, #{currentUser.fullName}. Use the loan applications link to inspect pending requests and ensure the admin has correct supporting details.</div>
+    <div class="dashboard-grid">
+        <div class="dashboard-card">
+            <div class="dashboard-card__label">Pending Applications</div>
+            <div class="dashboard-card__value">#{empty loanReviewBean.pendingLoans ? 0 : loanReviewBean.pendingLoans.size()}</div>
+        </div>
+        <div class="dashboard-card dashboard-card--warn">
+            <div class="dashboard-card__label">Overdue Loans</div>
+            <div class="dashboard-card__value">#{empty loanReviewBean.overdueLoans ? 0 : loanReviewBean.overdueLoans.size()}</div>
+        </div>
+        <div class="dashboard-card dashboard-card--gold">
+            <div class="dashboard-card__label">Action Required</div>
+            <div class="dashboard-card__value">Review applications</div>
+        </div>
+    </div>
+</ui:define>
+</ui:composition>

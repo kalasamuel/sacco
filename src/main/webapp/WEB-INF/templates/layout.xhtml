@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Kimwanyi SACCO — <ui:insert name="title">Dashboard</ui:insert></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+    <h:outputStylesheet name="css/app.css"/>
+</h:head>
+<h:body>
+    <div class="app-shell">
+
+        <header class="app-header">
+            <div class="app-header__brand">Kimwanyi SACCO</div>
+
+            <h:panelGroup layout="block" styleClass="app-header__search #{currentUser.member ? 'hidden' : ''}">
+                <form method="get" action="#{facesContext.externalContext.requestContextPath}/app/common/quick-search.xhtml">
+                    <input type="text" name="q" placeholder="Quick search: name, membership #, or National ID"/>
+                </form>
+            </h:panelGroup>
+
+            <div class="app-header__user">
+                <span class="app-header__date">
+                    <h:outputText value="#{clock.now}">
+                        <f:convertDateTime pattern="EEE, dd MMM yyyy HH:mm"/>
+                    </h:outputText>
+                </span>
+                <span class="app-header__name">#{currentUser.fullName}</span>
+                <span class="app-header__role">(#{currentUser.role})</span>
+                <h:form prependId="false">
+                    <input id="csrfTokenHeader" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+                    <p:commandButton value="Logout" action="#{currentUser.logout}"
+                                      styleClass="ui-button-secondary" ajax="false"/>
+                </h:form>
+            </div>
+        </header>
+
+        <nav class="app-nav">
+            <ui:fragment rendered="#{currentUser.admin}">
+                <h:link outcome="/app/admin/dashboard" value="Dashboard"/>
+                <h:link outcome="/app/admin/members" value="Member Directory"/>
+                <h:link outcome="/app/admin/loan-review" value="Loan Review"/>
+                <h:link outcome="/app/cashier/register-member" value="Register Member"/>
+            </ui:fragment>
+            <ui:fragment rendered="#{currentUser.cashier}">
+                <h:link outcome="/app/cashier/dashboard" value="Dashboard"/>
+                <h:link outcome="/app/cashier/savings" value="Savings"/>
+                <h:link outcome="/app/cashier/loan-repayment" value="Loan Repayment"/>
+                <h:link outcome="/app/cashier/register-member" value="Register Member"/>
+            </ui:fragment>
+            <ui:fragment rendered="#{currentUser.loanOfficer}">
+                <h:link outcome="/app/officer/dashboard" value="Dashboard"/>
+                <h:link outcome="/app/officer/loan-applications" value="Loan Applications"/>
+            </ui:fragment>
+            <ui:fragment rendered="#{currentUser.member}">
+                <h:link outcome="/app/member/dashboard" value="Dashboard"/>
+                <h:link outcome="/app/member/apply-loan" value="Apply for Loan"/>
+                <h:link outcome="/app/member/profile" value="My Profile"/>
+            </ui:fragment>
+        </nav>
+
+        <main class="app-content">
+            <p:growl showDetail="true" life="6000"/>
+            <ui:insert name="content"/>
+        </main>
+
+    </div>
+</h:body>
+</html>

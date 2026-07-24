@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 template="/WEB-INF/templates/layout.xhtml">
+<ui:define name="title">Member Directory</ui:define>
+<ui:define name="content">
+
+    <h1 class="page-title">Member Directory</h1>
+    <p class="section-intro">Search, filter, and manage membership status for all SACCO members. Deactivation is subject to outstanding loan checks.</p>
+
+    <h:form prependId="false" id="filterForm" styleClass="form-card">
+        <input id="csrfTokenMembersFilter" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+        <div class="search-panel">
+            <div>
+                <label>Search</label>
+                <p:inputText value="#{memberDirectoryBean.searchText}" placeholder="Name, membership #, National ID" styleClass="ui-inputtext"/>
+            </div>
+            <div>
+                <label>Status</label>
+                <p:selectOneMenu value="#{memberDirectoryBean.statusFilter}" styleClass="ui-inputfield">
+                    <f:selectItem itemLabel="All" itemValue="ALL"/>
+                    <f:selectItem itemLabel="Active" itemValue="ACTIVE"/>
+                    <f:selectItem itemLabel="Deactivated" itemValue="DEACTIVATED"/>
+                </p:selectOneMenu>
+            </div>
+            <div>
+                <label>Loan Status</label>
+                <p:selectOneMenu value="#{memberDirectoryBean.loanStatusFilter}" styleClass="ui-inputfield">
+                    <f:selectItem itemLabel="All" itemValue="ALL"/>
+                    <f:selectItem itemLabel="No Active Loan" itemValue="NONE"/>
+                    <f:selectItem itemLabel="Active" itemValue="ACTIVE"/>
+                    <f:selectItem itemLabel="Overdue" itemValue="OVERDUE"/>
+                    <f:selectItem itemLabel="Pending Application" itemValue="PENDING"/>
+                </p:selectOneMenu>
+            </div>
+            <div>
+                <p:commandButton value="Apply Filters" action="#{memberDirectoryBean.applyFilters}" update=":directoryTable" styleClass="ui-button-primary button-primary"/>
+            </div>
+        </div>
+    </h:form>
+
+    <div id="directoryTable" class="table-card">
+        <p:dataTable id="directoryTable" value="#{memberDirectoryBean.filteredMembers}" var="m" paginator="true" rows="15"
+                     emptyMessage="No members match these filters." styleClass="ui-datatable-responsive">
+            <p:column headerText="Photo" styleClass="col-photo">
+                <h:graphicImage value="/app/common/photo?memberId=#{m.id}" styleClass="member-photo"
+                                 rendered="#{not empty m.photoPath}"/>
+            </p:column>
+            <p:column headerText="Full Name"><h:outputText value="#{m.fullName}"/></p:column>
+            <p:column headerText="Membership #"><h:outputText value="#{m.membershipNumber}"/></p:column>
+            <p:column headerText="National ID"><h:outputText value="#{m.nationalId}"/></p:column>
+            <p:column headerText="Savings Balance">
+                <h:outputText value="#{memberDirectoryBean.balanceOf(m)}" styleClass="money"><f:converter converterId="moneyConverter"/></h:outputText>
+            </p:column>
+            <p:column headerText="Active Loan Status">
+                <h:outputText value="#{memberDirectoryBean.loanStatusLabelOf(m)}"/>
+            </p:column>
+            <p:column headerText="Status">
+                <span class="badge #{m.active ? 'badge--pass' : 'badge--fail'}">
+                    #{m.active ? 'ACTIVE' : 'DEACTIVATED'}
+                </span>
+            </p:column>
+            <p:column headerText="Actions">
+                <h:form prependId="false" rendered="#{m.active}">
+                    <input id="csrfTokenMemberDeactivate#{m.id}" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+                    <p:commandButton value="Deactivate" action="#{memberDirectoryBean.prepareDeactivate(m.id)}"
+                                      update=":deactivateDialog" oncomplete="PF('deactivateDialog').show()"
+                                      styleClass="ui-button-danger button-danger"/>
+                </h:form>
+            </p:column>
+        </p:dataTable>
+    </div>
+
+    <p:dialog widgetVar="deactivateDialog" header="Confirm Deactivation" modal="true" width="380" id="deactivateDialog">
+        <h:form prependId="false">
+            <input id="csrfTokenMembersDeactivate" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+
+            <h:panelGroup rendered="#{memberDirectoryBean.deactivationBlocked}">
+                <p class="text-danger-strong">
+                    This member has an unresolved loan balance and cannot be deactivated
+                    until it is fully repaid, rejected, or otherwise closed.
+                </p>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{!memberDirectoryBean.deactivationBlocked}">
+                <p>
+                    Are you sure you want to deactivate this member? Their account and
+                    transaction history are preserved — deactivation only prevents
+                    further transactions, and can be reviewed by an admin at any time.
+                </p>
+                <p:commandButton value="Confirm Deactivation" action="#{memberDirectoryBean.confirmDeactivate}"
+                                  update=":directoryTable :deactivateDialog" oncomplete="PF('deactivateDialog').hide()"
+                                  styleClass="ui-button-danger button-danger"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+</ui:define>
+</ui:composition>

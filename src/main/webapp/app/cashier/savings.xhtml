@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 template="/WEB-INF/templates/layout.xhtml">
+<ui:define name="title">Cashier Counter</ui:define>
+<ui:define name="content">
+
+    <f:metadata>
+        <f:viewParam name="memberId" value="#{savingsBean.selectedMemberId}"/>
+        <f:viewAction action="#{savingsBean.loadIfPresent}"/>
+    </f:metadata>
+
+    <h1 class="page-title">Cashier Counter</h1>
+    <p class="section-intro">Search a member, select their account, and process savings or withdrawals with immediate receipts and transaction history.</p>
+
+    <h:form prependId="false" id="searchForm" styleClass="form-card">
+        <input id="csrfTokenSavingsSearch" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+        <div class="search-panel">
+            <div>
+                <p:inputText value="#{memberLookupBean.searchQuery}" placeholder="Membership number, National ID, or name" styleClass="ui-inputtext"/>
+            </div>
+            <div>
+                <p:commandButton value="Search" action="#{memberLookupBean.search}" update="resultsPanel" styleClass="ui-button-primary button-primary"/>
+            </div>
+        </div>
+    </h:form>
+
+    <div id="resultsPanel" class="table-card mt-16" rendered="#{not empty memberLookupBean.results}">
+        <p:dataTable value="#{memberLookupBean.results}" var="m" rowKey="#{m.id}" emptyMessage="No members found.">
+            <p:column headerText="Membership #"><h:outputText value="#{m.membershipNumber}"/></p:column>
+            <p:column headerText="Name"><h:outputText value="#{m.fullName}"/></p:column>
+            <p:column headerText="National ID"><h:outputText value="#{m.nationalId}"/></p:column>
+            <p:column headerText="">
+                <h:form prependId="false">
+                    <input id="csrfTokenSavingsSelectMember#{m.id}" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+                    <p:commandButton value="Select" action="#{savingsBean.loadMember(m.id)}"
+                                      update=":counterPanel" styleClass="ui-button-secondary button-secondary"/>
+                </h:form>
+            </p:column>
+        </p:dataTable>
+    </div>
+
+    <div id="counterPanel" layout="block" rendered="#{not empty savingsBean.selectedMember}">
+        <div class="account-summary">
+            <h:graphicImage value="/app/common/photo?memberId=#{savingsBean.selectedMemberId}"
+                            styleClass="member-photo member-photo--lg"
+                            rendered="#{not empty savingsBean.selectedMember.photoPath}"/>
+            <div class="account-summary__info">
+                <h2>#{savingsBean.selectedMember.fullName}</h2>
+                <p>Member No: <strong>#{savingsBean.selectedMember.membershipNumber}</strong> | National ID: <strong>#{savingsBean.selectedMember.nationalId}</strong></p>
+                <p class="mt-8">
+                    <span class="badge #{savingsBean.selectedMember.active ? 'badge--pass' : 'badge--fail'}">
+                        #{savingsBean.selectedMember.active ? 'ACTIVE' : 'DEACTIVATED'}
+                    </span>
+                    <span class="ml-10">Active Savings: <strong class="money">#{savingsBean.currentBalance}</strong></span>
+                    <span class="ml-10">Active Loan: <strong>#{savingsBean.activeLoanStatusLabel}</strong></span>
+                </p>
+            </div>
+        </div>
+
+        <p class="mt-12">
+            <a href="../common/statement?memberId=#{savingsBean.selectedMemberId}" target="_blank">Download Account Statement (PDF)</a>
+        </p>
+
+        <div class="panel-card mt-20">
+            <p:tabView>
+                <p:tab title="Deposit">
+                    <h:form prependId="false" id="depositForm" styleClass="form-card" onsubmit="return true;">
+                        <input id="csrfTokenSavingsDeposit" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+                        <div class="field-row">
+                            <label for="depositAmount">Amount (UGX)</label>
+                            <p:inputNumber id="depositAmount" value="#{savingsBean.amount}" decimalPlaces="2"
+                                           required="true" styleClass="full-width"/>
+                        </div>
+                        <p:commandButton value="Confirm Deposit" action="#{savingsBean.deposit}"
+                                          update=":counterPanel" styleClass="ui-button-success button-success"
+                                          oncomplete="showReceiptDialogOnComplete(args)"/>
+                    </h:form>
+                </p:tab>
+                <p:tab title="Withdrawal">
+                    <h:form prependId="false" id="withdrawForm" styleClass="form-card">
+                        <input id="csrfTokenSavingsWithdraw" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+                        <div class="field-row">
+                            <label for="amount">Amount (UGX)</label>
+                            <p:inputNumber id="amount" value="#{savingsBean.amount}" decimalPlaces="2"
+                                           required="true" styleClass="full-width"
+                                           onkeyup="checkWithdrawalGuard()" onchange="checkWithdrawalGuard()"/>
+                            <div id="guardMessage" class="text-danger-small hidden mt-4">
+                                This amount would breach the required minimum balance of UGX 20,000.
+                            </div>
+                            <div class="text-caption">
+                                Max withdrawable while preserving the minimum balance:
+                                <h:outputText value="#{savingsBean.maxWithdrawable}" class="money"><f:converter converterId="moneyConverter"/></h:outputText>
+                            </div>
+                        </div>
+                        <p:commandButton id="withdrawBtn" value="Confirm Withdrawal" action="#{savingsBean.withdraw}"
+                                          update=":counterPanel" styleClass="ui-button-danger button-danger"
+                                          oncomplete="showReceiptDialogOnComplete(args)"/>
+                    </h:form>
+
+                    <h:outputScript target="body">
+                        var maxWithdrawable = #{empty savingsBean.maxWithdrawable ? 0 : savingsBean.maxWithdrawable};
+                        function showReceiptDialogOnComplete(args) {
+                            if (args && !args.validationFailed) {
+                                PF('receiptDialog').show();
+                            }
+                        }
+                        function checkWithdrawalGuard() {
+                            var input = document.getElementById('amount_input');
+                            var btn = document.getElementById('withdrawBtn');
+                            var msg = document.getElementById('guardMessage');
+                            if (!input || !btn) { return; }
+                            var value = parseFloat(input.value.replace(/,/g, '')) || 0;
+                            if (value > maxWithdrawable) {
+                                btn.disabled = true;
+                                btn.classList.add('ui-state-error');
+                                if (msg) { msg.style.display = 'block'; }
+                            } else {
+                                btn.disabled = false;
+                                btn.classList.remove('ui-state-error');
+                                if (msg) { msg.style.display = 'none'; }
+                            }
+                        }
+                    </h:outputScript>
+                </p:tab>
+            </p:tabView>
+        </div>
+
+        <div class="table-card mt-24">
+            <h3>Transaction History</h3>
+            <p:dataTable value="#{savingsBean.statement}" var="tx" emptyMessage="No transactions yet."
+                          paginator="true" rows="10">
+                <p:column headerText="Date"><h:outputText value="#{tx.createdAt}"/></p:column>
+                <p:column headerText="Type"><h:outputText value="#{tx.type}"/></p:column>
+                <p:column headerText="Amount"><h:outputText value="#{tx.amount}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></p:column>
+                <p:column headerText="Balance After"><h:outputText value="#{tx.balanceAfter}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></p:column>
+                <p:column headerText="Reference"><h:outputText value="#{tx.reference}"/></p:column>
+                <p:column headerText="Processed By"><h:outputText value="#{tx.performedBy.fullName}"/></p:column>
+            </p:dataTable>
+        </div>
+
+        <p:dialog widgetVar="receiptDialog" header="Transaction Receipt" modal="true" width="360"
+                   rendered="#{not empty savingsBean.receiptTransaction}">
+            <div id="receiptPrintArea">
+                <h4 class="mt-0">Kimwanyi SACCO</h4>
+                <p>#{savingsBean.selectedMember.fullName} — #{savingsBean.selectedMember.membershipNumber}</p>
+                <table class="receipt-table">
+                    <tr><td>Previous Balance</td><td class="text-right">
+                        <h:outputText value="#{savingsBean.receiptPreviousBalance}" class="money"><f:converter converterId="moneyConverter"/></h:outputText>
+                    </td></tr>
+                    <tr><td>#{savingsBean.receiptTransaction.type}</td><td class="text-right">
+                        <h:outputText value="#{savingsBean.receiptTransaction.amount}" class="money"><f:converter converterId="moneyConverter"/></h:outputText>
+                    </td></tr>
+                    <tr><td><strong>New Balance</strong></td><td class="text-right">
+                        <strong><h:outputText value="#{savingsBean.receiptTransaction.balanceAfter}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></strong>
+                    </td></tr>
+                </table>
+                <p class="text-caption">
+                    Reference: #{savingsBean.receiptTransaction.reference}<br/>
+                    Cashier: #{savingsBean.receiptTransaction.performedBy.fullName}<br/>
+                    Time: <h:outputText value="#{savingsBean.receiptTransaction.createdAt}"/>
+                </p>
+            </div>
+            <button type="button" onclick="window.print()">Print Receipt</button>
+        </p:dialog>
+    </div>
+
+</ui:define>
+</ui:composition>

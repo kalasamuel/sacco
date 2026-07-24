@@ -19,7 +19,7 @@
 
     <!-- Security-relevant events (failed logins, unauthorized access attempts,
          approvals/rejections) are logged distinctly at INFO/WARN so audit_logs
-         (Section 2) has a matching, human-readable server-side trail. -->
+         has a matching, human-readable server-side trail. -->
     <logger name="com.pahappa.sacco.security" level="INFO"/>
     <logger name="com.pahappa.sacco.filter" level="WARN"/>
     <logger name="org.hibernate.SQL" level="WARN"/>

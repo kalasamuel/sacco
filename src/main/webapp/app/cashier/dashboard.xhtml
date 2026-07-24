@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 template="/WEB-INF/templates/layout.xhtml">
+<ui:define name="title">Cashier Dashboard</ui:define>
+<ui:define name="content">
+    <h1 class="page-title">Cashier Dashboard</h1>
+    <p class="section-intro">Quickly access savings, repayments and member registration tools from your cashier dashboard.</p>
+
+    <div class="dashboard-grid">
+        <div class="dashboard-card">
+            <div class="dashboard-card__label">Cashier</div>
+            <div class="dashboard-card__value">#{currentUser.fullName}</div>
+        </div>
+        <div class="dashboard-card dashboard-card--gold">
+            <div class="dashboard-card__label">Role</div>
+            <div class="dashboard-card__value">#{currentUser.role}</div>
+        </div>
+        <div class="dashboard-card dashboard-card--warn">
+            <div class="dashboard-card__label">Quick Actions</div>
+            <div class="dashboard-card__value">Use nav links</div>
+        </div>
+    </div>
+</ui:define>
+</ui:composition>

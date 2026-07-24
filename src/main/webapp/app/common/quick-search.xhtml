@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 template="/WEB-INF/templates/layout.xhtml">
+<ui:define name="title">Quick Search</ui:define>
+<ui:define name="content">
+
+    <f:metadata>
+        <f:viewParam name="q" value="#{memberLookupBean.searchQuery}"/>
+        <f:viewAction action="#{memberLookupBean.search}"/>
+    </f:metadata>
+
+    <h1 class="page-title">Search Results</h1>
+    <p class="section-intro">Showing results for "#{memberLookupBean.searchQuery}". Refine search terms in the header quick search if needed.</p>
+
+    <div class="table-card">
+        <p:dataTable value="#{memberLookupBean.results}" var="m" emptyMessage="No members found." styleClass="ui-datatable-responsive">
+            <p:column headerText="Photo" styleClass="col-photo-small">
+                <h:graphicImage value="/app/common/photo?memberId=#{m.id}" styleClass="member-photo"
+                                 rendered="#{not empty m.photoPath}"/>
+            </p:column>
+            <p:column headerText="Membership #"><h:outputText value="#{m.membershipNumber}"/></p:column>
+            <p:column headerText="Name"><h:outputText value="#{m.fullName}"/></p:column>
+            <p:column headerText="National ID"><h:outputText value="#{m.nationalId}"/></p:column>
+            <p:column headerText="Status">
+                <span class="badge #{m.active ? 'badge--pass' : 'badge--fail'}">
+                    #{m.active ? 'ACTIVE' : 'DEACTIVATED'}
+                </span>
+            </p:column>
+            <p:column headerText="Actions">
+                <h:link outcome="/app/cashier/savings" value="Savings" styleClass="button-secondary">
+                    <f:param name="memberId" value="#{m.id}"/>
+                </h:link>
+            </p:column>
+        </p:dataTable>
+    </div>
+
+</ui:define>
+</ui:composition>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 template="/WEB-INF/templates/layout.xhtml">
+<ui:define name="title">Loan Repayment</ui:define>
+<ui:define name="content">
+
+    <h1 class="page-title">Loan Repayment</h1>
+    <p class="section-intro">Search a member, view their active loans, and record repayments with a clear cashier workflow.</p>
+
+    <h:form prependId="false" id="searchForm" styleClass="form-card">
+        <input id="csrfTokenLoanRepaymentSearch" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+        <div class="search-panel">
+            <div>
+                <p:inputText value="#{memberLookupBean.searchQuery}" placeholder="Membership number, National ID, or name" styleClass="ui-inputtext"/>
+            </div>
+            <div>
+                <p:commandButton value="Search" action="#{memberLookupBean.search}" update="resultsPanel" styleClass="ui-button-primary button-primary"/>
+            </div>
+        </div>
+    </h:form>
+
+    <div id="resultsPanel" class="table-card mt-16" rendered="#{not empty memberLookupBean.results}">
+        <p:dataTable value="#{memberLookupBean.results}" var="m" rowKey="#{m.id}" emptyMessage="No members found.">
+            <p:column headerText="Membership #"><h:outputText value="#{m.membershipNumber}"/></p:column>
+            <p:column headerText="Name"><h:outputText value="#{m.fullName}"/></p:column>
+            <p:column headerText="">
+                <h:form prependId="false">
+                    <input id="csrfTokenLoanRepaymentViewLoans#{m.id}" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+                    <p:commandButton value="View Loans" action="#{loanApplicationBean.loadHistory(m.id)}"
+                                      update=":loansPanel" styleClass="ui-button-secondary button-secondary"/>
+                </h:form>
+            </p:column>
+        </p:dataTable>
+    </div>
+
+    <div id="loansPanel" class="mt-24" rendered="#{not empty loanApplicationBean.loanHistory}">
+        <div class="panel-card">
+            <h2 class="mt-0">Loans</h2>
+            <p:dataTable value="#{loanApplicationBean.loanHistory}" var="loan" rowKey="#{loan.id}" styleClass="ui-datatable-responsive">
+                <p:column headerText="Principal"><h:outputText value="#{loan.principal}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></p:column>
+                <p:column headerText="Remaining"><h:outputText value="#{loan.remainingBalance}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></p:column>
+                <p:column headerText="Status"><h:outputText value="#{loan.status}"/></p:column>
+                <p:column headerText="">
+                    <h:form prependId="false" rendered="#{loan.status eq 'ACTIVE' or loan.status eq 'OVERDUE'}">
+                        <input id="csrfTokenLoanRepaymentSelectLoan#{loan.id}" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+                        <p:commandButton value="Repay" action="#{loanRepaymentBean.loadLoan(loan.id)}"
+                                          update=":repayPanel" styleClass="ui-button-primary button-primary"/>
+                    </h:form>
+                </p:column>
+            </p:dataTable>
+        </div>
+    </div>
+
+    <div id="repayPanel" class="panel-card mt-24" rendered="#{not empty loanRepaymentBean.selectedLoanId}">
+        <h2>Record Repayment — Loan #{loanRepaymentBean.selectedLoanId}</h2>
+
+        <h:form prependId="false" styleClass="form-card mt-16">
+            <input id="csrfTokenLoanRepaymentForm" type="hidden" name="csrfToken" value="#{csrfBean.token}"/>
+            <div class="field-row">
+                <label for="amount">Amount (UGX)</label>
+                <p:inputNumber id="amount" value="#{loanRepaymentBean.amount}" decimalPlaces="2"
+                               required="true" styleClass="full-width"/>
+            </div>
+            <p:commandButton value="Record Repayment" action="#{loanRepaymentBean.repay}" update=":repayPanel" styleClass="ui-button-primary button-primary"/>
+        </h:form>
+
+        <div class="table-card mt-24">
+            <h3 class="mt-0">Repayment History</h3>
+            <p:dataTable value="#{loanRepaymentBean.repaymentHistory}" var="r" emptyMessage="No repayments yet.">
+                <p:column headerText="Date"><h:outputText value="#{r.createdAt}"/></p:column>
+                <p:column headerText="Amount"><h:outputText value="#{r.amount}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></p:column>
+                <p:column headerText="Remaining After"><h:outputText value="#{r.balanceAfter}" class="money"><f:converter converterId="moneyConverter"/></h:outputText></p:column>
+                <p:column headerText="Reference"><h:outputText value="#{r.reference}"/></p:column>
+            </p:dataTable>
+        </div>
+    </div>
+
+</ui:define>
+</ui:composition>
