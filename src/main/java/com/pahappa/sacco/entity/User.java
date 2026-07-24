@@ -1,18 +1,16 @@
 package com.pahappa.sacco.entity;
 
-import java.io.Serializable;
-import java.lang.reflect.Member;
-import java.time.LocalDateTime;
-
-import javax.management.relation.Role;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
-public class User implements Serializable{
-    
+public class User implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,6 +42,7 @@ public class User implements Serializable{
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", unique = true)
     private Member memberProfile;
@@ -69,7 +68,6 @@ public class User implements Serializable{
         this.updatedAt = LocalDateTime.now();
     }
 
-    // getters and setters
 
     public Long getId() { return id; }
 
@@ -94,7 +92,6 @@ public class User implements Serializable{
     public Member getMemberProfile() { return memberProfile; }
     public void setMemberProfile(Member memberProfile) { this.memberProfile = memberProfile; }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -112,5 +109,4 @@ public class User implements Serializable{
     public String toString() {
         return "User{id=" + id + ", username='" + username + "', role=" + role + '}';
     }
-
 }
