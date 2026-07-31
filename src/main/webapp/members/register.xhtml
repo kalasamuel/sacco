@@ -1,0 +1,242 @@
+<ui:composition
+        template="/WEB-INF/templates/login-template.xhtml"
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:pt="jakarta.faces.passthrough">
+
+    <ui:define name="title">Register | Kimwanyi SACCO</ui:define>
+
+    <!-- ═══════════════════════════════════════════════
+    Multi-step Registration Form
+    ═══════════════════════════════════════════════ -->
+    <ui:define name="formContent">
+
+
+        <h2 class="reg-heading">Create Account</h2>
+
+        <h:form id="regForm">
+
+            <!-- ════ STEP 1 — Personal Info ════ -->
+            <div id="step1">
+
+                <div class="reg-field">
+                    <h:outputLabel for="firstName" value="First Name"/>
+                    <h:inputText id="firstName"
+                                 value="#{memberRegistrationBean.form.firstName}"
+                                 label="First Name" required="true"
+                                 requiredMessage="First name is required"
+                                 styleClass="reg-input"/>
+                    <h:message for="firstName" styleClass="reg-error"/>
+                </div>
+
+                <div class="reg-field">
+                    <h:outputLabel for="lastName" value="Last Name"/>
+                    <h:inputText id="lastName"
+                                 value="#{memberRegistrationBean.form.lastName}"
+                                 label="Last Name" required="true"
+                                 requiredMessage="Last name is required"
+                                 styleClass="reg-input"/>
+                    <h:message for="lastName" styleClass="reg-error"/>
+                </div>
+
+                <div class="reg-field">
+                    <h:outputLabel for="nationalId" value="National ID"/>
+                    <h:inputText id="nationalId"
+                                 value="#{memberRegistrationBean.form.nationalId}"
+                                 label="National ID" required="true"
+                                 requiredMessage="National ID is required"
+                                 styleClass="reg-input"/>
+                    <h:message for="nationalId" styleClass="reg-error"/>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn-next" onclick="goStep(1,2)">Next</button>
+                </div>
+            </div>
+
+            <!-- ════ STEP 2 — Account Info ════ -->
+            <div id="step2" style="display:none;">
+
+                <div class="reg-field">
+                    <h:outputLabel for="username" value="Username"/>
+                    <h:inputText id="username"
+                                 value="#{memberRegistrationBean.form.username}"
+                                 label="Username" required="true"
+                                 requiredMessage="Username is required"
+                                 styleClass="reg-input"/>
+                    <h:message for="username" styleClass="reg-error"/>
+                </div>
+
+                <div class="reg-field">
+                    <h:outputLabel for="email" value="Email Address"/>
+                    <h:inputText id="email"
+                                 value="#{memberRegistrationBean.form.email}"
+                                 label="Email" required="true"
+                                 requiredMessage="Email address is required"
+                                 styleClass="reg-input">
+                        <f:validateRegex pattern="^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"/>
+                    </h:inputText>
+                    <h:message for="email" styleClass="reg-error"/>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn-back" onclick="goStep(2,1)">
+                        Back
+                    </button>
+                    <button type="button" class="btn-next" onclick="goStep(2,3)">Next</button>
+                </div>
+            </div>
+
+            <!-- ════ STEP 3 — Security ════ -->
+            <div id="step3" style="display:none;">
+
+                <div class="reg-field">
+                    <h:outputLabel for="password" value="Password"/>
+                    <div style="position:relative;">
+                        <h:inputSecret id="password"
+                                       value="#{memberRegistrationBean.form.password}"
+                                       pt:placeholder="Minimum 8 characters"
+                                       label="Password" required="true"
+                                       requiredMessage="Password is required"
+                                       redisplay="true"
+                                       styleClass="reg-input">
+                            <f:validateLength minimum="8"/>
+                        </h:inputSecret>
+                    </div>
+                    <h:message for="password" styleClass="reg-error"/>
+                </div>
+
+                <div class="reg-field">
+                    <label for="confirmPwd">Confirm Password</label>
+                    <input type="password" id="confirmPwd" class="reg-input"
+                           placeholder="Re-enter your password"/>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn-back" onclick="goStep(3,2)">
+                       Back
+                    </button>
+                    <h:commandButton value="Create Account"
+                                     action="#{memberRegistrationBean.register}"
+                                     onclick="return submitRegistration(this)"
+                                     styleClass="btn-submit"/>
+                </div>
+            </div>
+
+        </h:form>
+
+        <div class="reg-footer">
+            Already have an account?
+            <h:link value="Sign In" outcome="/login.xhtml"/>
+        </div>
+
+        <script>
+            function submitRegistration(button) {
+                if (!validateStep3()) return false;
+                button.value = 'Submitting..';
+                window.setTimeout(function () { button.disabled = true; }, 0);
+                return true;
+            }
+
+            // ── Step navigation ──────────────
+            function goStep(from, to) {
+                var fields = getStepFields(from);
+                if (to > from) {
+                    for (var i = 0; i &lt; fields.length; i++) {
+                        if (!fields[i].value.trim()) {
+                            showToast('error', 'Missing Information',
+                                      'Please fill in all fields before continuing.');
+                            fields[i].focus();
+                            return;
+                        }
+                    }
+                }
+                document.getElementById('step' + from).style.display = 'none';
+                document.getElementById('step' + to).style.display = 'block';
+                updateStepBar(to);
+            }
+
+            function getStepFields(step) {
+                var s = document.getElementById('step' + step);
+                return Array.prototype.slice.call(s.querySelectorAll('input[type="text"],input[type="password"]'));
+            }
+
+            // ── Password match validation ─────────────────────
+            function validateStep3() {
+                var pwd  = document.getElementById('regForm:password').value;
+                var cpwd = document.getElementById('confirmPwd').value;
+                if (pwd !== cpwd) {
+                    showToast('error', 'Password Mismatch',
+                              'Passwords do not match. Please try again.');
+                    return false;
+                }
+                if (pwd.length &lt; 8) {
+                    showToast('error', 'Too Short',
+                              'Password must be at least 8 characters.');
+                    return false;
+                }
+                return true;
+            }
+
+            // ── Toast engine ─────────────────────────────────
+            function showToast(type, title, message) {
+                var c = document.querySelector('.toast-container');
+                if (!c) {
+                    c = document.createElement('ul');
+                    c.className = 'toast-container';
+                    document.body.appendChild(c);
+                }
+                var icon = type === 'success' ? '&#10003;' : '&#33;';
+                var li = document.createElement('li');
+                li.className = 'toast-item toast-' + type;
+                li.innerHTML =
+                    '&lt;div class="toast-icon"&gt;' + icon + '&lt;/div&gt;' +
+                    '&lt;div class="toast-body"&gt;' +
+                        '&lt;div class="toast-title"&gt;' + title + '&lt;/div&gt;' +
+                        '&lt;div class="toast-msg"&gt;'   + message + '&lt;/div&gt;' +
+                    '&lt;/div&gt;';
+                c.appendChild(li);
+                setTimeout(function() {
+                    li.style.transition = 'opacity 0.4s, transform 0.4s';
+                    li.style.opacity    = '0';
+                    li.style.transform  = 'translateX(60px)';
+                    setTimeout(function() { li.remove(); }, 420);
+                }, 5000);
+            }
+
+            // ── Auto-dismiss server-side messages ────────────
+            document.addEventListener('DOMContentLoaded', function() {
+                var items = document.querySelectorAll('.toast-container li, .toast-item');
+                items.forEach(function(el, i) {
+                    setTimeout(function() {
+                        el.style.transition = 'opacity 0.4s, transform 0.4s';
+                        el.style.opacity    = '0';
+                        el.style.transform  = 'translateX(60px)';
+                        setTimeout(function() { el.remove(); }, 420);
+                    }, 5000 + i * 300);
+                });
+
+                // Restore step position after validation error (page reload)
+                var hasErrors = document.querySelector('.reg-error');
+                if (hasErrors) {
+                    // Try to show the right step
+                    var steps = ['step1','step2','step3'];
+                    steps.forEach(function(id) {
+                        var s = document.getElementById(id);
+                        var err = s ? s.querySelector('.reg-error:not(:empty)') : null;
+                        if (err) {
+                            steps.forEach(function(x) {
+                                document.getElementById(x).style.display = 'none';
+                            });
+                            s.style.display = 'block';
+                            updateStepBar(parseInt(id.replace('step',''), 10));
+                        }
+                    });
+                }
+            });
+        </script>
+    </ui:define>
+
+</ui:composition>
