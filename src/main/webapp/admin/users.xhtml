@@ -1,0 +1,162 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/admin-template.xhtml">
+
+    <ui:define name="title">Member Approvals | Admin</ui:define>
+    <ui:define name="pageHeader">Members and Access</ui:define>
+
+    <ui:define name="content">
+        <h:form id="userForm">
+            <h:panelGroup id="approvalQueue" layout="block"
+                          styleClass="work-queue-banner #{userManagementBean.pendingApprovalCount gt 0 ? 'has-work' : 'is-clear'}">
+                <div class="work-queue-icon">
+                    <i class="fa-solid #{userManagementBean.pendingApprovalCount gt 0 ? 'fa-user-clock' : 'fa-circle-check'}"></i>
+                </div>
+                <div>
+                    <div class="work-queue-label">Member approval queue</div>
+                    <div class="work-queue-value">
+                        <h:outputText value="#{userManagementBean.pendingApprovalCount} registration#{userManagementBean.pendingApprovalCount == 1 ? '' : 's'} waiting for review"
+                                      rendered="#{userManagementBean.pendingApprovalCount gt 0}"/>
+                        <h:outputText value="All member registrations have been reviewed"
+                                      rendered="#{userManagementBean.pendingApprovalCount == 0}"/>
+                    </div>
+                </div>
+            </h:panelGroup>
+
+            <div class="section-card">
+                <div class="section-header user-toolbar">
+                    <div>
+                        <span class="section-title">User directory</span>
+                        <div class="section-support">Approve registrations and manage account access from one action menu.</div>
+                    </div>
+                    <div class="directory-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <h:inputText id="userSearch"
+                                     value="#{userManagementBean.searchKeyword}"
+                                     aria-label="Search users"
+                                     pt:placeholder="Search name, username/email"
+                                     xmlns:pt="jakarta.faces.passthrough"/>
+                        <p:commandButton value="Search"
+                                         icon="fa-solid fa-magnifying-glass"
+                                         action="#{userManagementBean.search}"
+                                         process="@this userSearch"
+                                         update=":userForm:userTable :userForm:approvalQueue"/>
+                    </div>
+                </div>
+
+                <div class="section-body table-shell">
+                    <p:dataTable id="userTable"
+                                 value="#{userManagementBean.results}"
+                                 var="user"
+                                 paginator="true"
+                                 rows="10"
+                                 paginatorPosition="bottom"
+                                 rowsPerPageTemplate="10,20,50"
+                                 emptyMessage="No users match your search."
+                                 reflow="true"
+                                 styleClass="operations-table">
+                        <p:column headerText="User">
+                            <div class="identity-cell">
+                                <div class="identity-avatar">#{user.username.substring(0,1).toUpperCase()}</div>
+                                <div>
+                                    <div class="identity-name">#{user.firstName} #{user.lastName}</div>
+                                    <div class="identity-meta">@#{user.username}</div>
+                                </div>
+                            </div>
+                        </p:column>
+                        <p:column headerText="Email">
+                            <span class="cell-secondary">#{empty user.email ? 'No email provided' : user.email}</span>
+                        </p:column>
+                        <p:column headerText="Role">
+                            <span class="status-chip neutral">#{user.role}</span>
+                        </p:column>
+                        <p:column headerText="Status">
+                            <h:panelGroup rendered="#{user.pendingApproval}">
+                                <span class="status-chip pending"><i class="fa-solid fa-clock"></i> Pending approval</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{not user.pendingApproval and user.enabled}">
+                                <span class="status-chip active"><i class="fa-solid fa-circle-check"></i> Active</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{not user.pendingApproval and not user.enabled}">
+                                <span class="status-chip disabled"><i class="fa-solid fa-circle-minus"></i> Disabled</span>
+                            </h:panelGroup>
+                        </p:column>
+                        <p:column headerText="Joined">
+                            <h:outputText value="#{user.createdAt}" styleClass="cell-secondary">
+                                <f:convertDateTime type="localDateTime" pattern="dd MMM yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Actions" styleClass="actions-column">
+                            <p:menuButton value="Actions"
+                                          icon="fa-solid fa-ellipsis-vertical"
+                                          buttonStyleClass="#{user.pendingApproval ? 'pending-action-trigger' : 'row-action-trigger'}"
+                                          aria-label="Actions for #{user.firstName} #{user.lastName}">
+                                <p:menuitem value="Approve member"
+                                            icon="fa-solid fa-user-check"
+                                            rendered="#{user.pendingApproval}"
+                                            action="#{userManagementBean.approve(user.id)}"
+                                            process="@this"
+                                            update=":userForm:userTable :userForm:approvalQueue :growl"/>
+                                <p:menuitem value="#{user.enabled ? 'Disable account' : 'Enable account'}"
+                                            icon="#{user.enabled ? 'fa-solid fa-user-slash' : 'fa-solid fa-user-check'}"
+                                            rendered="#{user.username != 'admin' and not user.pendingApproval}"
+                                            action="#{userManagementBean.toggleEnabled(user.id, user.enabled)}"
+                                            process="@this"
+                                            update=":userForm:userTable :userForm:approvalQueue :growl"/>
+                                <p:menuitem value="Reset password"
+                                            icon="fa-solid fa-key"
+                                            action="#{userManagementBean.setSelectedUserId(user.id)}"
+                                            process="@this"
+                                            update=":resetPwdForm"
+                                            oncomplete="PF('resetPwdDialog').show()"/>
+                            </p:menuButton>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+        </h:form>
+
+        <p:dialog header="Reset user password"
+                  widgetVar="resetPwdDialog"
+                  modal="true"
+                  responsive="true"
+                  width="420"
+                  resizable="false"
+                  appendTo="@(body)">
+            <h:form id="resetPwdForm">
+                <div class="dialog-intro">
+                    <i class="fa-solid fa-shield-keyhole"></i>
+                    <div>
+                        <strong>Set a temporary password</strong>
+                        <p>Use at least 8 characters and share it through a secure channel.</p>
+                    </div>
+                </div>
+                <div class="dialog-field">
+                    <h:outputLabel for="newPwd" value="New password"/>
+                    <p:password id="newPwd"
+                                value="#{userManagementBean.newPassword}"
+                                required="true"
+                                requiredMessage="Password is required"
+                                minlength="8"
+                                feedback="true"
+                                toggleMask="true"/>
+                    <p:message for="newPwd"/>
+                </div>
+                <div class="dialog-actions">
+                    <p:commandButton value="Cancel" type="button"
+                                     onclick="PF('resetPwdDialog').hide()"
+                                     styleClass="ui-button-flat ui-button-secondary"/>
+                    <p:commandButton value="Reset password"
+                                     icon="fa-solid fa-key"
+                                     action="#{userManagementBean.resetPassword}"
+                                     process="@form"
+                                     update=":growl :userForm:userTable @form"
+                                     oncomplete="if (!args.validationFailed) PF('resetPwdDialog').hide()"/>
+                </div>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
