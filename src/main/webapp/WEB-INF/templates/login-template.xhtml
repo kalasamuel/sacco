@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>
+        <ui:insert name="title">Kimwanyi SACCO</ui:insert>
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+
+    <!-- Global stylesheet -->
+    <h:outputStylesheet library="css" name="global.css"/>
+</h:head>
+
+<h:body>
+
+    <script>
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
+
+    <!-- PrimeFaces Growl — global toast for all messages on this template -->
+    <p:growl id="growl" globalOnly="true" showDetail="true" life="6000" sticky="false"/>
+
+    <div class="login-card">
+
+        <div class="panel-logins">
+
+            <!-- Logo Area -->
+            <div class="logo-area">
+                <div>
+                    <div class="logo-name"><span>Kimwanyi SACCO</span></div>
+                </div>
+            </div>
+
+            <ui:insert name="formContent"/>
+
+        </div>
+
+    </div>
+
+</h:body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+    <title><ui:insert name="title">Admin Dashboard | Kimwanyi SACCO</ui:insert></title>
+    
+    <!-- Load FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    
+    <!-- Load global styles if needed, but primarily admin.css -->
+    <h:outputStylesheet library="css" name="admin.css"/>
+    
+    <ui:insert name="head"/>
+</h:head>
+
+<h:body>
+
+    <script>
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
+
+    <!-- Global PrimeFaces Growl for notifications -->
+    <p:growl id="growl" showDetail="true" life="5000" sticky="false"/>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo-text" style="gap: 0.5rem; font-size: 1.15rem;">
+                <div style="display: flex; flex-direction: column; line-height: 1;">
+                    <span style="color: white;">KIMWANYI</span>
+                    <span style="color: var(--primary);">SACCO</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <h:link outcome="/admin/dashboard" styleClass="nav-item #{view.viewId == '/admin/dashboard.xhtml' ? 'active' : ''}">
+                <i class="fa-solid fa-chart-pie"></i>
+                Dashboard
+            </h:link>
+            
+            <h:link outcome="/admin/users" styleClass="nav-item #{view.viewId == '/admin/users.xhtml' ? 'active' : ''}">
+                <i class="fa-solid fa-users"></i>
+                User Management
+            </h:link>
+
+            <h:link outcome="/admin/loans" styleClass="nav-item #{view.viewId == '/admin/loans.xhtml' ? 'active' : ''}">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+                Loan Approvals
+            </h:link>
+            
+            <h:link outcome="/admin/savings" styleClass="nav-item #{view.viewId == '/admin/savings.xhtml' ? 'active' : ''}">
+                <i class="fa-solid fa-vault"></i>
+                Savings
+            </h:link>
+            
+            <h:link outcome="/admin/audit-logs" styleClass="nav-item #{view.viewId == '/admin/audit-logs.xhtml' ? 'active' : ''}">
+                <i class="fa-solid fa-clipboard-list"></i>
+                Audit Logs
+            </h:link>
+        </nav>
+    </aside>
+    <button type="button" class="admin-sidebar-scrim" aria-label="Close navigation"
+            onclick="document.body.classList.remove('admin-nav-open')"></button>
+
+    <!-- Main Content wrapper -->
+    <main class="admin-main">
+        
+        <!-- Topbar -->
+        <header class="admin-topbar">
+            <button type="button" class="admin-nav-toggle" aria-label="Open navigation"
+                    onclick="document.body.classList.toggle('admin-nav-open')">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <!-- Left Side: Search Bar -->
+            <div class="topbar-search">
+                <div class="topbar-search-field">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Search.." aria-label="Search the administration portal"/>
+                </div>
+            </div>
+            
+            <!-- Right Side: Profile & Actions -->
+            <div class="topbar-actions">
+                
+                <div class="topbar-icons">
+                    <p:commandButton type="button"
+                                     icon="fa-regular fa-envelope"
+                                     aria-label="Compose mail"
+                                     title="Compose mail"
+                                     onclick="PF('emailComposerDialog').show()"
+                                     styleClass="topbar-icon-button ui-button-flat"/>
+                    <h:panelGroup id="notifBell" styleClass="notification-trigger">
+                        <i class="fa-regular fa-bell"></i>
+                        <h:panelGroup rendered="#{notificationBean.unreadCount > 0}">
+                            <span class="notif-badge">#{notificationBean.unreadCount}</span>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </div>
+
+                <p:overlayPanel for="notifBell" id="notifPanel" widgetVar="notifPanelWidget" dismissable="true" styleClass="notification-panel">
+                    <h:form id="notifForm">
+                        <div class="notification-panel-header">
+                            <strong>Notifications</strong>
+                            <p:commandLink action="#{notificationBean.markAllAsRead}" rendered="#{notificationBean.unreadCount > 0}"
+                                           update=":notifBell :notifPanel" oncomplete="PF('notifPanelWidget').show();"
+                                           styleClass="notification-mark-all">
+                                Mark all read
+                            </p:commandLink>
+                        </div>
+
+                        <h:panelGroup rendered="#{empty notificationBean.recent}">
+                            <div class="notification-empty">No notifications yet</div>
+                        </h:panelGroup>
+
+                        <ui:repeat value="#{notificationBean.recent}" var="n">
+                            <p:commandLink action="#{notificationBean.openNotification(n)}"
+                                           update=":notifBell :notifPanel"
+                                           styleClass="notification-link">
+                                <div class="notification-entry #{n.readStatus ? '' : 'unread'}">
+                                    <i class="fa-solid #{notificationBean.iconClass(n)} notification-entry-icon"></i>
+                                    <div>
+                                        <div class="notification-title #{n.readStatus ? '' : 'unread'}">#{n.title}</div>
+                                        <div class="notification-message">#{n.message}</div>
+                                        <div class="notification-time">
+                                            <h:outputText value="#{n.createdAt}">
+                                                <f:convertDateTime type="localDateTime" pattern="dd MMM yyyy HH:mm"/>
+                                            </h:outputText>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:commandLink>
+                        </ui:repeat>
+                    </h:form>
+                </p:overlayPanel>
+                
+                <div class="topbar-divider"></div>
+                
+                <div class="user-info topbar-user-info">
+                    <div class="user-details topbar-user-details">
+                        <span class="user-name topbar-user-name">#{userSessionBean.loggedInUser.username}</span>
+                        <span class="user-role topbar-user-role">Administrator</span>
+                    </div>
+                    <div class="user-avatar topbar-user-avatar">
+                        #{not empty userSessionBean.loggedInUser ? userSessionBean.loggedInUser.username.substring(0,1).toUpperCase() : 'A'}
+                    </div>
+                </div>
+
+                <h:form styleClass="logout-form">
+                    <h:commandLink action="#{loginBean.logout}" styleClass="logout-link" title="Sign Out">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </h:commandLink>
+                </h:form>
+            </div>
+        </header>
+
+        <!-- Dynamic Content -->
+        <div class="admin-content">
+            <ui:insert name="content">
+                <!-- Page specific content goes here -->
+            </ui:insert>
+        </div>
+
+        <p:dialog header="Compose member email"
+                  widgetVar="emailComposerDialog"
+                  modal="true"
+                  responsive="true"
+                  width="620"
+                  resizable="false"
+                  appendTo="@(body)"
+                  styleClass="email-composer-dialog">
+            <h:form id="emailComposerForm">
+                <div class="composer-heading">
+                    <div class="composer-heading-icon"><i class="fa-solid fa-paper-plane"></i></div>
+                    <div>
+                        <strong>Send an official SACCO message</strong>
+                        <p>Choose one member or an eligible group. Delivery is recorded in the audit log.</p>
+                    </div>
+                </div>
+
+                <div class="composer-grid">
+                    <div class="composer-field">
+                        <h:outputLabel for="recipientMode" value="Send to"/>
+                        <p:selectOneButton id="recipientMode" value="#{emailComposerBean.recipientMode}" required="true">
+                            <f:selectItem itemLabel="One member" itemValue="MEMBER"/>
+                            <f:selectItem itemLabel="Member group" itemValue="GROUP"/>
+                            <p:ajax process="@this" update="recipientTarget"/>
+                        </p:selectOneButton>
+                    </div>
+
+                    <h:panelGroup id="recipientTarget" layout="block" styleClass="composer-field">
+                        <h:panelGroup rendered="#{emailComposerBean.recipientMode == 'MEMBER'}" layout="block">
+                            <h:outputLabel for="memberRecipient" value="Member"/>
+                            <p:selectOneMenu id="memberRecipient"
+                                             value="#{emailComposerBean.memberId}"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             required="#{emailComposerBean.recipientMode == 'MEMBER'}"
+                                             requiredMessage="Select a member">
+                                <f:selectItem itemLabel="Select a member" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{emailComposerBean.members}" var="member"
+                                               itemValue="#{member.id}"
+                                               itemLabel="#{member.fullName} — #{member.email}"/>
+                            </p:selectOneMenu>
+                            <p:message for="memberRecipient"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{emailComposerBean.recipientMode == 'GROUP'}" layout="block">
+                            <h:outputLabel for="groupRecipient" value="Group"/>
+                            <p:selectOneMenu id="groupRecipient"
+                                             value="#{emailComposerBean.group}"
+                                             required="#{emailComposerBean.recipientMode == 'GROUP'}"
+                                             requiredMessage="Select a member group">
+                                <f:selectItem itemLabel="Select a group" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{emailComposerBean.groupOptions}"/>
+                            </p:selectOneMenu>
+                            <p:message for="groupRecipient"/>
+                        </h:panelGroup>
+                    </h:panelGroup>
+
+                    <h:panelGroup layout="block" styleClass="delivery-scope"
+                                  rendered="#{emailComposerBean.recipientMode == 'GROUP' and not empty emailComposerBean.group}">
+                        <i class="fa-solid fa-users"></i>
+                        <div>
+                            <strong>#{emailComposerBean.recipientCount} eligible member#{emailComposerBean.recipientCount == 1 ? '' : 's'} will receive this email</strong>
+                            <span>#{emailComposerBean.skippedRecipientCount} member#{emailComposerBean.skippedRecipientCount == 1 ? '' : 's'} without a valid email address will be skipped.</span>
+                        </div>
+                    </h:panelGroup>
+
+                    <div class="composer-field">
+                        <h:outputLabel for="emailSubject" value="Subject"/>
+                        <p:inputText id="emailSubject"
+                                     value="#{emailComposerBean.subject}"
+                                     maxlength="160"
+                                     required="true"
+                                     requiredMessage="Enter an email subject"
+                                     placeholder="e.g. Your Kimwanyi SACCO account update"/>
+                        <p:message for="emailSubject"/>
+                    </div>
+
+                    <div class="composer-field">
+                        <h:outputLabel for="emailMessage" value="Message"/>
+                        <p:inputTextarea id="emailMessage"
+                                         value="#{emailComposerBean.message}"
+                                         rows="8"
+                                         maxlength="5000"
+                                         autoResize="false"
+                                         required="true"
+                                         requiredMessage="Enter the message to send"
+                                         placeholder="Write a clear message for the selected recipient(s)."/>
+                        <div class="composer-help">The member receives this at the email address on their profile.</div>
+                        <p:message for="emailMessage"/>
+                    </div>
+                </div>
+
+                <div class="dialog-actions">
+                    <p:commandButton value="Cancel"
+                                     type="button"
+                                     onclick="PF('emailComposerDialog').hide()"
+                                     styleClass="ui-button-flat ui-button-secondary"/>
+                    <p:commandButton value="#{emailComposerBean.recipientMode == 'GROUP' ? 'Send group email' : 'Send email'}"
+                                     icon="fa-solid fa-paper-plane"
+                                     action="#{emailComposerBean.send}"
+                                     process="@form"
+                                     update="@form :growl"
+                                     disableOnAjax="true"
+                                     oncomplete="if (!args.validationFailed) PF('emailComposerDialog').hide()">
+                        <p:confirm header="Send this email?"
+                                   message="Confirm the recipients, subject and message. Email delivery and any failures will be recorded."
+                                   icon="fa-solid fa-triangle-exclamation"/>
+                    </p:commandButton>
+                </div>
+            </h:form>
+        </p:dialog>
+        <p:confirmDialog global="true" responsive="true" width="440">
+            <p:commandButton value="Cancel" type="button"
+                             styleClass="ui-confirmdialog-no ui-button-flat ui-button-secondary"/>
+            <p:commandButton value="Confirm" type="button" icon="fa-solid fa-check"
+                             styleClass="ui-confirmdialog-yes"/>
+        </p:confirmDialog>
+        
+    </main>
+
+</h:body>
+</html>
