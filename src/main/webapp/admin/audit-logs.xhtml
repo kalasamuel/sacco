@@ -1,0 +1,100 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/admin-template.xhtml">
+
+    <ui:define name="title">Audit Logs | Admin</ui:define>
+    
+    <ui:define name="pageHeader">System Audit Logs</ui:define>
+
+    <ui:define name="content">
+        <div class="section-card">
+            
+            <h:form id="auditForm">
+                <!-- Toolbar: Filter -->
+                <div class="section-header workflow-filter-bar">
+                    
+                    <div class="workflow-filter-field">
+                        <h:outputLabel for="dateFrom" value="Start date"/>
+                        <p:datePicker id="dateFrom" value="#{auditLogBean.filter.dateFrom}" pattern="dd MMM yyyy"
+                                      styleClass="audit-filter-input" placeholder="Any" />
+                    </div>
+
+                    <div class="workflow-filter-field">
+                        <h:outputLabel for="dateTo" value="End date"/>
+                        <p:datePicker id="dateTo" value="#{auditLogBean.filter.dateTo}" pattern="dd MMM yyyy"
+                                      styleClass="audit-filter-input" placeholder="Any" />
+                    </div>
+
+                    <div class="workflow-filter-field">
+                        <h:outputLabel for="actionFilter" value="Action"/>
+                        <h:selectOneMenu id="actionFilter" value="#{auditLogBean.filter.action}" styleClass="workflow-select">
+                            <f:selectItem itemLabel="All Actions" itemValue="#{null}" />
+                            <f:selectItems value="#{auditLogBean.actionOptions}" var="act" itemLabel="#{act}" itemValue="#{act}" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <div class="workflow-filter-action">
+                        <h:commandButton action="#{auditLogBean.search}" value="Filter logs" styleClass="workflow-primary-button">
+                            <f:ajax execute="@form" render="logTable"/>
+                        </h:commandButton>
+                    </div>
+                </div>
+
+                <div class="results-summary">
+                    <span><strong>#{auditLogBean.results.size()}</strong> audit event#{auditLogBean.results.size() == 1 ? '' : 's'} currently loaded</span>
+                    <span>Newest events appear first</span>
+                </div>
+
+                <!-- Data Table -->
+                <div class="section-body table-shell">
+                    <p:dataTable id="logTable" value="#{auditLogBean.results}" var="log"
+                                 paginator="true" rows="15" paginatorPosition="bottom"
+                                 rowsPerPageTemplate="15,30,50"
+                                 emptyMessage="No audit logs match your filters."
+                                 reflow="true"
+                                 styleClass="operations-table audit-table">
+                        
+                        <p:column headerText="Timestamp" sortBy="#{log.createdAt}">
+                            <div class="audit-time">
+                                <h:outputText value="#{log.createdAt}">
+                                    <f:convertDateTime type="localDateTime" pattern="dd MMM yyyy"/>
+                                </h:outputText>
+                                <h:outputText value="#{log.createdAt}">
+                                    <f:convertDateTime type="localDateTime" pattern="HH:mm:ss"/>
+                                </h:outputText>
+                            </div>
+                        </p:column>
+                        
+                        <p:column headerText="Actor">
+                            <div class="identity-name">
+                                #{log.actorUsername != null ? log.actorUsername : 'System'}
+                            </div>
+                        </p:column>
+
+                        <p:column headerText="Event">
+                            <span class="status-chip neutral">#{log.action}</span>
+                        </p:column>
+
+                        <p:column headerText="Entity">
+                            <div class="cell-secondary">
+                                #{log.entityType} 
+                                <h:outputText value="##{log.entityId}" rendered="#{not empty log.entityId}" styleClass="entity-id"/>
+                            </div>
+                        </p:column>
+                        
+                        <p:column headerText="Details">
+                            <div class="audit-description">
+                                #{not empty log.description ? log.description : '-'}
+                            </div>
+                        </p:column>
+                        
+                    </p:dataTable>
+                </div>
+            </h:form>
+        </div>
+        
+    </ui:define>
+</ui:composition>
