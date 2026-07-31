@@ -1,0 +1,786 @@
+/* -------------------------------------------------------------------------
+   1. DESIGN TOKENS
+   ------------------------------------------------------------------------- */
+:root {
+  /* --- Core surfaces --- */
+  --mem-surface: #131313;
+  --mem-surface-dim: #131313;
+  --mem-surface-bright: #3a3939;
+  --mem-surface-0: #0e0e0e;   /* container-lowest — sidebar / structural */
+  --mem-surface-1: #1c1b1b;   /* container-low */
+  --mem-surface-2: #201f1f;   /* container — cards */
+  --mem-surface-3: #2a2a2a;   /* container-high */
+  --mem-surface-4: #353534;   /* container-highest / variant */
+  --mem-background: #131313;
+
+  /* --- Text on surfaces --- */
+  --mem-on-surface: #e5e2e1;
+  --mem-on-surface-variant: #bdcbb2;
+  --mem-on-background: #e5e2e1;
+  --mem-inverse-surface: #e5e2e1;
+  --mem-inverse-on-surface: #313030;
+
+  /* --- Outlines --- */
+  --mem-outline: #88957e;
+  --mem-outline-variant: #3e4a37;
+  --mem-border: rgba(255, 255, 255, 0.05);
+  --mem-border-bright: rgba(255, 255, 255, 0.1);
+
+  /* --- Primary (neon-green accent) --- */
+  --mem-surface-tint: #67e037;
+  --mem-primary: #79f349;
+  --mem-on-primary: #0e3900;
+  --mem-primary-container: #5dd62c;
+  --mem-on-primary-container: #1a5800;
+  --mem-inverse-primary: #226d00;
+  --mem-primary-fixed: #83fe52;
+  --mem-primary-fixed-dim: #67e037;
+  --mem-on-primary-fixed: #052100;
+  --mem-on-primary-fixed-variant: #185200;
+
+  /* --- Secondary --- */
+  --mem-secondary: #91d971;
+  --mem-on-secondary: #0e3900;
+  --mem-secondary-container: #1e5f00;
+  --mem-on-secondary-container: #91d870;
+  --mem-secondary-fixed: #acf68a;
+  --mem-secondary-fixed-dim: #91d971;
+  --mem-on-secondary-fixed: #062100;
+  --mem-on-secondary-fixed-variant: #195200;
+
+  /* --- Tertiary (neutral) --- */
+  --mem-tertiary: #dbd8d7;
+  --mem-on-tertiary: #313030;
+  --mem-tertiary-container: #bfbcbc;
+  --mem-on-tertiary-container: #4c4c4c;
+
+  /* --- Error / status --- */
+  --mem-error: #ffb4ab;
+  --mem-on-error: #690005;
+  --mem-error-container: #93000a;
+  --mem-on-error-container: #ffdad6;
+
+  /* --- Typography --- */
+  --mem-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --mem-type-display-lg-size: 48px;
+  --mem-type-display-lg-weight: 700;
+  --mem-type-display-lg-line: 56px;
+  --mem-type-display-lg-tracking: -0.02em;
+
+  --mem-type-display-lg-mobile-size: 32px;
+  --mem-type-display-lg-mobile-line: 40px;
+
+  --mem-type-headline-md-size: 24px;
+  --mem-type-headline-md-weight: 700;
+  --mem-type-headline-md-line: 32px;
+  --mem-type-headline-md-tracking: -0.01em;
+
+  --mem-type-card-title-size: 18px;
+  --mem-type-card-title-weight: 600;
+  --mem-type-card-title-line: 24px;
+
+  --mem-type-body-lg-size: 16px;
+  --mem-type-body-lg-weight: 400;
+  --mem-type-body-lg-line: 24px;
+
+  --mem-type-body-sm-size: 14px;
+  --mem-type-body-sm-weight: 400;
+  --mem-type-body-sm-line: 20px;
+
+  --mem-type-label-caps-size: 12px;
+  --mem-type-label-caps-weight: 600;
+  --mem-type-label-caps-line: 16px;
+  --mem-type-label-caps-tracking: 0.05em;
+
+  /* --- Radii --- */
+  --mem-radius-sm: 0.25rem;
+  --mem-radius-default: 0.5rem;
+  --mem-radius-md: 0.75rem;
+  --mem-radius-lg: 1rem;
+  --mem-radius-xl: 1.5rem;
+  --mem-radius-full: 9999px;
+  --mem-radius-card: 18px;
+  --mem-radius-button: 14px;
+  --mem-radius-input: 12px;
+
+  /* --- Spacing (8px grid) --- */
+  --mem-space-xs: 4px;
+  --mem-space-sm: 8px;
+  --mem-space-md: 16px;
+  --mem-space-lg: 24px;
+  --mem-space-xl: 40px;
+  --mem-space-container-margin: 32px;
+  --mem-space-gutter: 24px;
+
+  /* --- Structural dimensions --- */
+  --mem-sidebar-width: 280px;
+  --mem-topbar-height: 72px;
+
+  /* --- Elevation / glass --- */
+  --mem-glass-blur: blur(20px);
+  --mem-focus-glow: 0 0 15px rgba(121, 243, 73, 0.3);
+  --mem-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --mem-shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.55);
+}
+
+/* -------------------------------------------------------------------------
+   2. RESET & BASE
+   ------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--mem-background);
+  color: var(--mem-on-background);
+  font-family: var(--mem-font-family);
+  font-size: var(--mem-type-body-lg-size);
+  font-weight: var(--mem-type-body-lg-weight);
+  line-height: var(--mem-type-body-lg-line);
+  font-variant-numeric: tabular-nums lining-nums;
+  display: flex;
+  align-items: stretch;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--mem-primary-container);
+  color: var(--mem-on-primary-container);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mem-surface-bright) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--mem-surface-bright);
+  border-radius: var(--mem-radius-full);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+.mem-nav-item:focus-visible,
+.mem-logout-btn:focus-visible,
+.ui-button:focus-visible {
+  outline: 2px solid var(--mem-primary);
+  outline-offset: 2px;
+  border-radius: var(--mem-radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Typography utilities */
+.mem-type-display-lg {
+  font-size: var(--mem-type-display-lg-size);
+  font-weight: var(--mem-type-display-lg-weight);
+  line-height: var(--mem-type-display-lg-line);
+  letter-spacing: var(--mem-type-display-lg-tracking);
+}
+.mem-type-headline-md {
+  font-size: var(--mem-type-headline-md-size);
+  font-weight: var(--mem-type-headline-md-weight);
+  line-height: var(--mem-type-headline-md-line);
+  letter-spacing: var(--mem-type-headline-md-tracking);
+}
+.mem-type-card-title {
+  font-size: var(--mem-type-card-title-size);
+  font-weight: var(--mem-type-card-title-weight);
+  line-height: var(--mem-type-card-title-line);
+}
+.mem-type-body-sm {
+  font-size: var(--mem-type-body-sm-size);
+  line-height: var(--mem-type-body-sm-line);
+}
+.mem-type-label-caps {
+  font-size: var(--mem-type-label-caps-size);
+  font-weight: var(--mem-type-label-caps-weight);
+  line-height: var(--mem-type-label-caps-line);
+  letter-spacing: var(--mem-type-label-caps-tracking);
+  text-transform: uppercase;
+}
+
+/* =========================================================================
+   3. SIDEBAR
+   ========================================================================= */
+.mem-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--mem-sidebar-width);
+  background: var(--mem-surface-0);
+  border-right: 1px solid var(--mem-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 40;
+  overflow-y: auto;
+}
+
+.mem-brand-name {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--mem-on-surface);
+  padding: var(--mem-space-lg) var(--mem-space-lg) 0;
+}
+
+.mem-brand-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mem-primary);
+  padding: 2px var(--mem-space-lg) var(--mem-space-lg);
+  letter-spacing: 0.02em;
+}
+
+/* Profile block */
+.mem-profile-block {
+  display: flex;
+  align-items: center;
+  gap: var(--mem-space-md);
+  margin: 0 var(--mem-space-lg) var(--mem-space-lg);
+  padding: var(--mem-space-md);
+  background: var(--mem-surface-1);
+  border: 1px solid var(--mem-border);
+  border-radius: var(--mem-radius-card);
+}
+
+.mem-avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--mem-radius-full);
+  background: var(--mem-primary-container);
+  color: var(--mem-on-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.mem-profile-name {
+  font-size: var(--mem-type-body-sm-size);
+  font-weight: 600;
+  color: var(--mem-on-surface);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mem-profile-role {
+  font-size: 12px;
+  color: var(--mem-on-surface-variant);
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+/* Nav */
+.mem-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mem-space-xs);
+  padding: 0 var(--mem-space-md) var(--mem-space-md);
+}
+
+.mem-nav-label {
+  padding: var(--mem-space-md) var(--mem-space-md) var(--mem-space-xs);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--mem-on-surface-variant);
+  opacity: 0.6;
+}
+
+.mem-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--mem-space-md);
+  padding: 12px var(--mem-space-md);
+  border-radius: var(--mem-radius-input);
+  color: var(--mem-on-surface-variant);
+  font-size: var(--mem-type-body-sm-size);
+  font-weight: 500;
+  line-height: var(--mem-type-body-sm-line);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.mem-nav-item i {
+  width: 18px;
+  text-align: center;
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+.mem-nav-item:hover {
+  background: var(--mem-surface-1);
+  color: var(--mem-on-surface);
+}
+
+.mem-nav-item.active {
+  background: var(--mem-primary);
+  color: var(--mem-on-primary);
+  font-weight: 600;
+}
+
+.mem-nav-item.active i {
+  opacity: 1;
+}
+
+/* Sidebar footer / logout */
+.mem-sidebar-footer {
+  margin-top: auto;
+  padding: var(--mem-space-md) var(--mem-space-lg) var(--mem-space-lg);
+  border-top: 1px solid var(--mem-border);
+}
+
+.mem-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--mem-space-md);
+  padding: 12px var(--mem-space-md);
+  border-radius: var(--mem-radius-input);
+  color: var(--mem-on-surface-variant);
+  font-size: var(--mem-type-body-sm-size);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.mem-logout-btn:hover {
+  background: var(--mem-error-container);
+  color: var(--mem-on-error-container);
+}
+
+/* =========================================================================
+   4. MAIN / TOPBAR
+   ========================================================================= */
+.mem-main {
+  margin-left: var(--mem-sidebar-width);
+  min-height: 100vh;
+  width: calc(100% - var(--mem-sidebar-width));
+  display: flex;
+  flex-direction: column;
+}
+
+.mem-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  min-height: var(--mem-topbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mem-space-lg);
+  padding: 0 var(--mem-space-container-margin);
+  background: rgba(19, 19, 19, 0.72);
+  backdrop-filter: var(--mem-glass-blur);
+  -webkit-backdrop-filter: var(--mem-glass-blur);
+  border-bottom: 1px solid var(--mem-border);
+}
+
+.mem-page-title {
+  font-size: var(--mem-type-headline-md-size);
+  font-weight: var(--mem-type-headline-md-weight);
+  line-height: var(--mem-type-headline-md-line);
+  letter-spacing: var(--mem-type-headline-md-tracking);
+  color: var(--mem-on-surface);
+}
+
+.mem-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--mem-space-lg);
+}
+
+.mem-topbar-notif {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--mem-radius-input);
+  color: var(--mem-on-surface-variant);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.mem-topbar-notif:hover {
+  background: var(--mem-surface-1);
+  color: var(--mem-on-surface);
+}
+
+.notif-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--mem-radius-full);
+  background: var(--mem-primary);
+  color: var(--mem-on-primary);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+.mem-topbar-user {
+  display: flex;
+  align-items: center;
+  gap: var(--mem-space-sm);
+  padding-left: var(--mem-space-lg);
+  border-left: 1px solid var(--mem-border-bright);
+}
+
+.mem-top-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--mem-radius-full);
+  background: var(--mem-primary-container);
+  color: var(--mem-on-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.mem-topbar-user-name {
+  font-size: var(--mem-type-body-sm-size);
+  font-weight: 600;
+  color: var(--mem-on-surface);
+  line-height: 1.2;
+}
+
+.mem-topbar-user-role {
+  font-size: 11px;
+  color: var(--mem-on-surface-variant);
+  opacity: 0.75;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* Content */
+.mem-content {
+  flex: 1;
+  padding: var(--mem-space-container-margin);
+  display: flex;
+  flex-direction: column;
+  gap: var(--mem-space-lg);
+}
+
+/* Generic card surface used within page content */
+.mem-content .mem-card {
+  background: var(--mem-surface-2);
+  border: 1px solid var(--mem-border);
+  border-radius: var(--mem-radius-card);
+  padding: var(--mem-space-lg);
+  box-shadow: var(--mem-shadow-card);
+}
+
+/* =========================================================================
+   5. NOTIFICATION PANEL (glassmorphic popover)
+   ========================================================================= */
+.ui-overlaypanel {
+  background: rgba(32, 31, 31, 0.85);
+  backdrop-filter: var(--mem-glass-blur);
+  -webkit-backdrop-filter: var(--mem-glass-blur);
+  border: 1px solid var(--mem-border-bright) !important;
+  border-radius: var(--mem-radius-card) !important;
+  box-shadow: var(--mem-shadow-modal);
+  color: var(--mem-on-surface);
+}
+
+.ui-overlaypanel .ui-overlaypanel-content {
+  padding: 0;
+}
+
+.mem-notif-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--mem-space-md);
+  border-bottom: 1px solid var(--mem-border);
+}
+
+.mem-notif-panel-title {
+  font-size: var(--mem-type-body-sm-size);
+  color: var(--mem-on-surface);
+}
+
+.mem-notif-mark-read {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mem-primary);
+}
+
+.mem-notif-mark-read:hover {
+  text-decoration: underline;
+}
+
+.mem-notif-empty {
+  padding: var(--mem-space-lg) var(--mem-space-md);
+  text-align: center;
+  color: var(--mem-on-surface-variant);
+  font-size: var(--mem-type-body-sm-size);
+}
+
+.mem-notif-item {
+  display: block;
+}
+
+.mem-notif-row {
+  display: flex;
+  gap: var(--mem-space-sm);
+  padding: var(--mem-space-sm) var(--mem-space-md);
+  border-bottom: 1px solid var(--mem-border);
+  align-items: flex-start;
+}
+
+.mem-notif-item:hover .mem-notif-row {
+  background: var(--mem-surface-1);
+}
+
+.mem-notif-row.unread {
+  background: rgba(121, 243, 73, 0.05);
+}
+
+.mem-notif-row i {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: var(--mem-radius-full);
+  background: var(--mem-surface-3);
+  color: var(--mem-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.mem-notif-title {
+  font-size: var(--mem-type-body-sm-size);
+  font-weight: 500;
+  color: var(--mem-on-surface);
+}
+
+.mem-notif-title.unread {
+  font-weight: 700;
+}
+
+.mem-notif-message {
+  font-size: 12px;
+  color: var(--mem-on-surface-variant);
+  margin-top: 2px;
+}
+
+.mem-notif-time {
+  font-size: 11px;
+  color: var(--mem-on-surface-variant);
+  opacity: 0.6;
+  margin-top: 4px;
+}
+
+/* =========================================================================
+   6. BUTTONS (PrimeFaces overrides — kept consistent with admin.css)
+   ========================================================================= */
+.ui-button,
+.ui-button.ui-widget {
+  font-family: inherit;
+  font-size: var(--mem-type-body-sm-size);
+  font-weight: 600;
+  border-radius: var(--mem-radius-button);
+  border: 1px solid transparent;
+  padding: 10px var(--mem-space-lg);
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.ui-button:not(.ui-button-flat):not(.ui-button-secondary) {
+  background: var(--mem-primary-container);
+  color: var(--mem-on-primary-container);
+}
+
+.ui-button:not(.ui-button-flat):not(.ui-button-secondary):hover {
+  background: var(--mem-primary);
+  color: var(--mem-on-primary);
+}
+
+.ui-button:not(.ui-button-flat):not(.ui-button-secondary):focus {
+  box-shadow: var(--mem-focus-glow);
+}
+
+.ui-button-secondary {
+  background: transparent;
+  color: var(--mem-on-surface);
+  border: 1px solid var(--mem-border-bright);
+}
+
+.ui-button-secondary:hover {
+  background: var(--mem-surface-3);
+}
+
+.ui-button-flat {
+  background: transparent;
+  color: var(--mem-on-surface-variant);
+  border-color: transparent;
+  padding: var(--mem-space-sm);
+}
+
+.ui-button-flat:hover {
+  background: var(--mem-surface-1);
+  color: var(--mem-on-surface);
+}
+
+/* =========================================================================
+   7. FORM CONTROLS
+   ========================================================================= */
+.ui-inputtext,
+.ui-inputtextarea,
+.ui-selectonemenu,
+input[type="text"],
+input[type="password"],
+input[type="email"],
+textarea {
+  font-family: inherit;
+  background: var(--mem-surface-0);
+  color: var(--mem-on-surface);
+  border: 1px solid var(--mem-border-bright);
+  border-radius: var(--mem-radius-input);
+  padding: 10px var(--mem-space-md);
+  font-size: var(--mem-type-body-sm-size);
+  line-height: var(--mem-type-body-sm-line);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.ui-inputtext:focus,
+.ui-inputtextarea:focus,
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--mem-primary);
+  box-shadow: var(--mem-focus-glow);
+}
+
+label,
+.ui-outputlabel {
+  display: block;
+  margin-bottom: var(--mem-space-xs);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mem-on-surface-variant);
+}
+
+/* =========================================================================
+   8. GROWL / TOASTS
+   ========================================================================= */
+.ui-growl {
+  z-index: 9999;
+}
+
+.ui-growl-item-container {
+  background: rgba(32, 31, 31, 0.92);
+  backdrop-filter: var(--mem-glass-blur);
+  -webkit-backdrop-filter: var(--mem-glass-blur);
+  border: 1px solid var(--mem-border-bright);
+  border-radius: var(--mem-radius-input);
+  box-shadow: var(--mem-shadow-modal);
+  color: var(--mem-on-surface);
+}
+
+.ui-growl-title {
+  color: var(--mem-on-surface);
+  font-weight: 600;
+}
+
+.ui-growl-message p {
+  color: var(--mem-on-surface-variant);
+}
+
+.ui-growl-image-info {
+  color: var(--mem-primary);
+}
+
+.ui-growl-image-error {
+  color: var(--mem-error);
+}
+
+/* =========================================================================
+   9. RESPONSIVE
+   ========================================================================= */
+@media (max-width: 1024px) {
+  .mem-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: var(--mem-shadow-modal);
+  }
+
+  body.mem-nav-open .mem-sidebar {
+    transform: translateX(0);
+  }
+
+  .mem-main {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .mem-topbar {
+    padding: 0 var(--mem-space-md);
+  }
+}
+
+@media (max-width: 640px) {
+  .mem-content {
+    padding: var(--mem-space-md);
+    gap: var(--mem-space-md);
+  }
+
+  .mem-topbar {
+    padding: 0 var(--mem-space-md);
+    gap: var(--mem-space-sm);
+  }
+
+  .mem-page-title {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .mem-topbar-user-name,
+  .mem-topbar-user-role {
+    display: none;
+  }
+
+  .ui-overlaypanel {
+    width: calc(100vw - 32px) !important;
+  }
+}

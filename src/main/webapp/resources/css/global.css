@@ -1,0 +1,392 @@
+/* ── Design Tokens ── */
+:root {
+    /* Surfaces */
+    --surface: #131313;
+    --surface-dim: #131313;
+    --surface-bright: #3a3939;
+    --surface-container-lowest: #0e0e0e;
+    --surface-container-low: #1c1b1b;
+    --surface-container: #201f1f;
+    --surface-container-high: #2a2a2a;
+    --surface-container-highest: #353534;
+
+    /* Text / on-colors */
+    --on-surface: #e5e2e1;
+    --on-surface-variant: #bdcbb2;
+    --outline: #88957e;
+    --outline-variant: #3e4a37;
+
+    /* Brand */
+    --primary: #79f349;
+    --on-primary: #0e3900;
+    --primary-container: #5dd62c;
+    --on-primary-container: #1a5800;
+    --secondary: #91d971;
+    --on-secondary: #0e3900;
+    --secondary-container: #1e5f00;
+
+    /* Status */
+    --error: #ffb4ab;
+    --on-error: #690005;
+    --error-container: #93000a;
+    --on-error-container: #ffdad6;
+
+    /* Shape */
+    --radius-card: 18px;
+    --radius-btn: 14px;
+    --radius-input: 12px;
+    --radius-xl: 1.5rem;
+
+    /* Spacing (8px grid) */
+    --sp-xs: 4px;
+    --sp-sm: 8px;
+    --sp-md: 16px;
+    --sp-lg: 24px;
+    --sp-xl: 40px;
+
+    /* Type */
+    --font-body: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Body ── */
+body {
+    min-height: 100vh;
+    background: var(--surface-container-lowest);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    padding: 1.5rem;
+    color: var(--on-surface);
+}
+
+/* ══════════════════════════════════════
+   AUTH CARD LAYOUT
+══════════════════════════════════════ */
+.login-card {
+    /* display: grid;
+    grid-template-columns: 1fr 1fr; */
+    width: 100%;
+    max-width: 500px;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background: var(--surface-container);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ── panel ── */
+.panel-logins {
+    background: var(--surface-container);
+    padding: 3rem 3.5rem;
+    overflow-y: auto;
+    max-height: 100vh;
+}
+
+/* ── Logo ── */
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+}
+
+.logo-name {
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: var(--on-surface);
+}
+
+.logo-name span { color: var(--primary); }
+
+.logo-tagline {
+    font-size: 0.7rem;
+    color: var(--on-surface-variant);
+    margin-top: 2px;
+    opacity: 0.65;
+}
+
+/* ══════════════════════════════════════
+   LOGIN FORM
+══════════════════════════════════════ */
+.form-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--on-surface);
+    letter-spacing: -0.01em;
+}
+
+.form-subtitle {
+    margin-top: 0.4rem;
+    color: var(--on-surface-variant);
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+.login-form {
+    margin-top: 2rem;
+}
+
+.field {
+    margin-bottom: 1.1rem;
+}
+
+.field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--on-surface-variant);
+    margin-bottom: 0.35rem;
+}
+
+.input-wrap { position: relative; }
+
+.input-icon {
+    position: absolute;
+    top: 50%;
+    left: 0.9rem;
+    transform: translateY(-50%);
+    color: var(--outline);
+    pointer-events: none;
+    display: flex;
+}
+
+.input-eye {
+    position: absolute;
+    top: 50%;
+    right: 0.9rem;
+    transform: translateY(-50%);
+    color: var(--outline);
+    cursor: pointer;
+    display: flex;
+}
+
+.sacco-field {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.75rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-input);
+    font-size: 0.875rem;
+    font-family: var(--font-body);
+    color: var(--on-surface);
+    background: var(--surface-container-lowest);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.sacco-field::placeholder { color: var(--outline); }
+
+.sacco-field:focus {
+    border-color: var(--primary);
+    background: var(--surface-container-lowest);
+}
+
+.sacco-field-eye { padding-right: 2.75rem; }
+
+.remember-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--on-surface-variant);
+    cursor: pointer;
+}
+
+.remember-row input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.btn-signin {
+    width: 100%;
+    background: var(--primary);
+    color: var(--on-primary);
+    border: none;
+    border-radius: var(--radius-btn);
+    padding: 1rem;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-signin:hover { background: var(--primary-container); }
+
+.register-row {
+    margin-top: 1.25rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--on-surface-variant);
+}
+
+.register-row a {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.register-row a:hover { text-decoration: underline; }
+
+/* ══════════════════════════════════════
+   REGISTRATION FORM (3-step)
+══════════════════════════════════════ */
+.reg-heading { font-size: 1.75rem; font-weight: 700; color: var(--on-surface); letter-spacing: -0.01em; }
+.reg-subtitle { margin-top: 0.3rem; font-size: 0.875rem; color: var(--on-surface-variant); opacity: 0.85; }
+
+/* Step indicator */
+.step-bar {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0 1.75rem;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--outline-variant);
+    z-index: 0;
+}
+
+.step-item.done::after { background: var(--primary); }
+
+.step-label {
+    margin-top: 5px;
+    font-size: 0.68rem;
+    color: var(--outline);
+    text-align: center;
+    font-weight: 500;
+}
+
+.step-item.active .step-label { color: var(--primary); font-weight: 700; }
+.step-item.done   .step-label { color: var(--primary); }
+
+/* Fields */
+.reg-field { margin-bottom: 1.1rem; }
+
+.reg-field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--on-surface-variant);
+    margin-bottom: 0.35rem;
+}
+
+.reg-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-input);
+    font-size: 0.875rem;
+    font-family: var(--font-body);
+    color: var(--on-surface);
+    background: var(--surface-container-lowest);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.reg-input::placeholder { color: var(--outline); }
+
+.reg-input:focus {
+    border-color: var(--primary);
+    background: var(--surface-container-lowest);
+}
+
+.reg-error { font-size: 0.78rem; color: var(--error); margin-top: 0.25rem; display: block; }
+
+/* Buttons */
+.btn-row { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+
+.btn-next, .btn-back, .btn-submit {
+    flex: 1; padding: 0.85rem 1rem;
+    border: none; border-radius: var(--radius-btn);
+    font-family: var(--font-body);
+    font-weight: 700; font-size: 0.875rem;
+    cursor: pointer; transition: background 0.2s;
+}
+
+.btn-next, .btn-submit { background: var(--primary); color: var(--on-primary); }
+.btn-next:hover, .btn-submit:hover { background: var(--primary-container); }
+.btn-back { background: var(--surface-container-high); color: var(--on-surface); }
+.btn-back:hover { background: var(--surface-container-highest); }
+
+/* Footer */
+.reg-footer {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--outline-variant);
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--on-surface-variant);
+}
+
+.reg-footer a { color: var(--primary); font-weight: 700; text-decoration: none; }
+.reg-footer a:hover { text-decoration: underline; }
+
+/* ══════════════════════════════════════
+   TOAST NOTIFICATIONS (register page JS engine)
+══════════════════════════════════════ */
+.toast-container {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    list-style: none;
+    width: min(340px, 90vw);
+}
+
+.toast-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    background: var(--surface-container-high);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--radius-input);
+    padding: 0.8rem 1rem;
+    backdrop-filter: blur(20px);
+    animation: toast-in 0.3s ease-out;
+}
+
+.toast-item.toast-error { border-left-color: var(--error); }
+
+.toast-icon {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700;
+    background: rgba(121,243,73,0.18); color: var(--primary);
+}
+
+.toast-error .toast-icon { background: rgba(255,180,171,0.18); color: var(--error); }
+
+.toast-title { font-size: 0.82rem; font-weight: 700; color: var(--on-surface); }
+.toast-msg { font-size: 0.78rem; color: var(--on-surface-variant); margin-top: 2px; }
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
