@@ -1,3 +1,4 @@
 .github
 .vscode
 target/
+hs_err_pid6644.log
